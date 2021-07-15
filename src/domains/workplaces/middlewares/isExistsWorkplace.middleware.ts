@@ -12,12 +12,8 @@ export class IsExistsWorkplaceMiddleware implements NestMiddleware {
     try {
       const workplaceId = Number.parseInt(req?.params?.workplaceId);
       const workplaceEntity = new Workplaces();
-      const userId = req?.body?.userId;
-      const userEntity = new Users();
 
       workplaceEntity.id = workplaceId;
-      userEntity.id = userId;
-      workplaceEntity.user = userEntity;
 
       const isExists = await this.workplacesService.isExistsWorkplace(workplaceEntity);
 
