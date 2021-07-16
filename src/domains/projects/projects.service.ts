@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Projects } from './projects.model';
 import { Repository } from 'typeorm';
 import { Workplaces } from '../workplaces/workplaces.model';
+import { Users } from '../users/users.model';
 
 @Injectable()
 export class ProjectsService {
@@ -28,7 +29,18 @@ export class ProjectsService {
     return await this.projectsRepository.count(project) === 1;
   }
 
-  async getWorkplaceProjects(workplace: Workplaces): Promise<Projects[]> {
-    return await this.projectsRepository.find({ where: { workplace } });
+  async getProjectMembers(project: Projects): Promise<Projects> {
+    return await this.projectsRepository.findOne(
+      {
+        where: {
+          id: project.id,
+        },
+        join: {
+          alias: 'project',
+          leftJoinAndSelect: {
+            users: 'project.users'
+          }
+        }
+      });
   }
 }

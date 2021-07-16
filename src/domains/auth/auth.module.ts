@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { forwardRef, MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from "@nestjs/config";
 import { JwtModule } from "@nestjs/jwt";
 import { RolesModule } from "../roles/roles.module";
@@ -20,7 +20,7 @@ import { IsEmailUniqueMiddleware } from '../../middlewares/isEmailUnique.middlew
           signOptions: { expiresIn: process.env.TOKEN_SECRET_EXPIRES_IN }
       }),
       RolesModule,
-      UsersModule,
+      forwardRef(() => UsersModule),
     ],
     controllers: [AuthController],
     providers: [AuthService, BcryptService, TokenService],

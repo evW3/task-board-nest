@@ -5,6 +5,7 @@ import { Permissions1626097862203 } from './03-Permissions';
 import { RolesPermissions1626097862204 } from './04-RolesPermissions';
 import { Workplaces1626097862205 } from './05-Workplaces';
 import { Projects1626097862206 } from './06-Projects';
+import { ProjectsMembers1626097862207 } from './07-ProjectsMembers';
 
 
 export class ClearAll1626097862300 implements MigrationInterface {
@@ -17,7 +18,9 @@ export class ClearAll1626097862300 implements MigrationInterface {
     const rolePermissions = new RolesPermissions1626097862204();
     const workplaceEntity = new Workplaces1626097862205();
     const projectsEntity = new Projects1626097862206();
+    const projectsMembersEntity = new ProjectsMembers1626097862207();
 
+    await projectsMembersEntity.down(queryRunner);
     await projectsEntity.down(queryRunner);
     await workplaceEntity.down(queryRunner);
     await usersEntity.down(queryRunner);

@@ -6,6 +6,7 @@ import { Workplaces } from './workplaces.model';
 import { TokenMiddleware } from '../../middlewares/token.middleware';
 import { AuthModule } from '../auth/auth.module';
 import { IsNotExistsWorkplaceMiddleware } from './middlewares/isNotExistsWorkplace.middleware';
+import { IsUserHaveWorkplaceMiddleware } from './middlewares/isUserHaveWorkplace.middleware';
 import { IsExistsWorkplaceMiddleware } from './middlewares/isExistsWorkplace.middleware';
 
 @Module({
@@ -26,9 +27,14 @@ export class WorkplacesModule implements NestModule {
       .apply(IsNotExistsWorkplaceMiddleware)
       .forRoutes({ path: 'workplaces/', method: RequestMethod.POST });
     consumer
+      .apply(IsUserHaveWorkplaceMiddleware)
+      .forRoutes(
+        { path: 'workplaces/:workplaceId$', method: RequestMethod.ALL }
+       );
+    consumer
       .apply(IsExistsWorkplaceMiddleware)
       .forRoutes(
-        { path: 'workplaces/:workplaceId**', method: RequestMethod.ALL }
-       );
+        { path: 'workplaces/:workplaceId/', method: RequestMethod.ALL }
+      )
   }
 }

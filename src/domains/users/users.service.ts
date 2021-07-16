@@ -2,9 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { Users } from "./users.model";
-import { Workplaces } from '../workplaces/workplaces.model';
 
-@Injectable() 
+@Injectable()
 export class UsersService {
     constructor(@InjectRepository(Users) private readonly usersRepository: Repository<Users>) {}
 
@@ -23,5 +22,4 @@ export class UsersService {
     async isUserExists(email: string): Promise<boolean> {
       return await this.usersRepository.count({ where: { email } }) === 1;
     }
-
 }

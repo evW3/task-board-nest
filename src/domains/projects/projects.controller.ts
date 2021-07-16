@@ -3,35 +3,44 @@ import { ProjectsService } from './projects.service';
 import { Projects } from './projects.model';
 import { Workplaces } from '../workplaces/workplaces.model';
 import { getManager } from 'typeorm';
+import { Users } from '../users/users.model';
+import { UsersService } from '../users/users.service';
+import { ProjectsMembersService } from './projectsMembers.service';
+import { ProjectDto } from './dto/project.dto';
 
 @Controller()
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService,
+              private readonly usersService: UsersService,
+              private readonly projectsMembersService: ProjectsMembersService) {}
 
   @Post('/')
-  async createProject(@Body('name') name: string, @Param('workplaceId') workplaceId: number) {
+  async createProject(@Body() projectDto: ProjectDto, @Param('workplaceId') workplaceId: number) {
     try {
       const projectEntity = new Projects();
       const workplaceEntity = new Workplaces();
 
       workplaceEntity.id = workplaceId;
-      projectEntity.name = name;
+      projectEntity.name = projectDto.name;
       projectEntity.workplace = workplaceEntity;
 
-      return await this.projectsService.saveProject(projectEntity);
+      const newProjectEntity = await this.projectsService.saveProject(projectEntity);
+
+      await this.projectsMembersService.saveProjectMember(newProjectEntity.id, projectDto.userId);
+
+      return newProjectEntity;
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   @Get('/')
-  async getProjects(@Param('workplaceId') workplaceId: number) {
+  async getProjects(@Param('workplaceId') workplaceId: number, @Body('userId') userId: number) {
     try {
       const workplaceEntity = new Workplaces();
 
       workplaceEntity.id = workplaceId;
-
-      return await this.projectsService.getWorkplaceProjects(workplaceEntity);
+      return 'Get'
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -60,6 +69,17 @@ export class ProjectsController {
       await this.projectsService.deleteProject(projectEntity);
 
       return { message: 'Project was deleted!', status: HttpStatus.OK };
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Post('/:projectId/add-member')
+  async addMemberToProject(@Body('userEmail') userEmail: string, @Param('projectId') projectId: number) {
+    try {
+      const userEntity = await this.usersService.findUserByEmail(userEmail);
+
+      return await this.projectsMembersService.saveProjectMember(projectId, userEntity.id);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }

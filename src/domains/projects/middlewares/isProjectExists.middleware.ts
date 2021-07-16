@@ -2,22 +2,23 @@ import { HttpException, HttpStatus, Injectable, NestMiddleware } from '@nestjs/c
 import { Request, Response, NextFunction } from 'express';
 import { ProjectsService } from '../projects.service';
 import { Projects } from '../projects.model';
+import { ProjectsMembersService } from '../projectsMembers.service';
 
 @Injectable()
 export class IsProjectExistsMiddleware implements NestMiddleware {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectsService,
+              private readonly projectsMembersService: ProjectsMembersService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       const projectId = Number.parseInt(req?.params?.projectId);
-      console.log(req?.params);
       const projectEntity = new Projects();
-
+      const userId = req?.body?.userId;
       projectEntity.id = projectId;
 
-      const isExistProject = await this.projectsService.isExistsProjects(projectEntity);
+      const isExistProject = await this.projectsMembersService.isExistsMember(projectId, userId);
 
-      if(isExistProject)
+      if(isExistProject.length === 1)
         next();
       else
         next(new HttpException('Can`t find project', HttpStatus.BAD_REQUEST));

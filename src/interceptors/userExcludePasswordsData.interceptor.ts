@@ -8,7 +8,9 @@ export interface Response<T> {
 
 @Injectable()
 export class UserExcludePasswordsDataInterceptor<T> implements NestInterceptor<T, Response<T>> {
-    intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-        return next.handle().pipe(map(data => ({ ...data, user: { ...data.user, password: undefined, password_salt: undefined }, password: undefined, password_salt: undefined })));
+    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+        return next.handle().pipe(map(data => {
+          return ({ ...data, user: { ...data.user, password: undefined, password_salt: undefined }, password: undefined, password_salt: undefined })
+        }));
     }
 }
