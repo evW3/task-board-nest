@@ -79,7 +79,9 @@ export class ProjectsController {
     try {
       const userEntity = await this.usersService.findUserByEmail(userEmail);
 
-      return await this.projectsMembersService.saveProjectMember(projectId, userEntity.id);
+      await this.projectsMembersService.saveProjectMember(projectId, userEntity.id);
+
+      return { message: 'User was added to project', status: HttpStatus.OK };
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
