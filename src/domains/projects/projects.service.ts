@@ -25,6 +25,10 @@ export class ProjectsService {
     return await this.projectsRepository.findOne({ where: { name } });
   }
 
+  async getProjects(workplace: Workplaces): Promise<Projects[]> {
+    return await this.projectsRepository.find({ where: { workplace } });
+  }
+
   async isExistsProjects(project: Projects): Promise<boolean> {
     return await this.projectsRepository.count(project) === 1;
   }

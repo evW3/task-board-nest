@@ -14,6 +14,8 @@ import { Workplaces } from './domains/workplaces/workplaces.model';
 import { ProjectsModule } from './domains/projects/projects.module';
 import { RouterModule } from 'nest-router';
 import { WorkplacesRoute } from './routes/workplaces.route';
+import { Lists } from './domains/lists/lists.model';
+import { ListsModule } from './domains/lists/lists.module';
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import { WorkplacesRoute } from './routes/workplaces.route';
       logging: false,
       database: process.env.POSTGRES_DB,
       migrations: ["src/migration/*.js"],
-      entities: [Users, Roles, Permissions, Workplaces, Projects],
+      entities: [Users, Roles, Permissions, Workplaces, Projects, Lists],
       cli: {
         migrationsDir: "migration"
       }
@@ -43,7 +45,8 @@ import { WorkplacesRoute } from './routes/workplaces.route';
     UsersModule,
     RolesModule,
     WorkplacesModule,
-    ProjectsModule
+    ProjectsModule,
+    ListsModule
   ],
   controllers: [],
   providers: [],

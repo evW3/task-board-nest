@@ -1,6 +1,16 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Workplaces } from '../workplaces/workplaces.model';
 import { Users } from '../users/users.model';
+import { Lists } from '../lists/lists.model';
 
 @Entity()
 export class Projects {
@@ -15,6 +25,9 @@ export class Projects {
   workplace: Workplaces;
 
   @ManyToMany(() => Users)
-  @JoinTable({name: "projects_members"})
+  @JoinTable({name: 'projects_members'})
   users: Users[];
+
+  @OneToMany(() => Lists, list => list.project)
+  lists: Lists[];
 }

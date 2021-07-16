@@ -27,7 +27,8 @@ export class Workplaces1626097862205 implements MigrationInterface {
     await queryRunner.createForeignKey('workplaces', new TableForeignKey({
       columnNames: ['user_id'],
       referencedColumnNames: ['id'],
-      referencedTableName: 'users'
+      referencedTableName: 'users',
+      onDelete: 'CASCADE'
     }));
   }
 

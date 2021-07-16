@@ -40,7 +40,8 @@ export class ProjectsController {
       const workplaceEntity = new Workplaces();
 
       workplaceEntity.id = workplaceId;
-      return 'Get'
+
+      return await this.projectsService.getProjects(workplaceEntity);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }

@@ -15,12 +15,14 @@ export class RolesPermissions1626097862204 implements MigrationInterface {
         await queryRunner.createForeignKey('roles_permission', new TableForeignKey({
             columnNames: ['role_id'],
             referencedColumnNames: ['id'],
-            referencedTableName: 'roles'
+            referencedTableName: 'roles',
+            onDelete: 'CASCADE'
         }));
         await queryRunner.createForeignKey('roles_permission', new TableForeignKey({
             columnNames: ['permission_id'],
             referencedColumnNames: ['id'],
-            referencedTableName: 'permissions'
+            referencedTableName: 'permissions',
+            onDelete: 'CASCADE'
         }));
     }
 

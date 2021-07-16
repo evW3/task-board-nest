@@ -18,7 +18,6 @@ export class IsUserOwnerMiddleware implements NestMiddleware {
       else
         next(new HttpException('Can`t find project', HttpStatus.BAD_REQUEST));
     } catch (e) {
-      console.log(e);
       if(e instanceof HttpException)
         next(e);
       else
