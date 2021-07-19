@@ -11,6 +11,7 @@ import {
 import { Workplaces } from '../workplaces/workplaces.model';
 import { Users } from '../users/users.model';
 import { Lists } from '../lists/lists.model';
+import { Cards } from '../cards/cards.model';
 
 @Entity()
 export class Projects {

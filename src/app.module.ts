@@ -16,6 +16,10 @@ import { RouterModule } from 'nest-router';
 import { WorkplacesRoute } from './routes/workplaces.route';
 import { Lists } from './domains/lists/lists.model';
 import { ListsModule } from './domains/lists/lists.module';
+import { Cards } from './domains/cards/cards.model';
+import { CardsActivity } from './domains/cards/cardsActivity.model';
+import { CardsAttachments } from './domains/cards/cardsAttachments.model';
+import { CardsModule } from './domains/cards/cards.module';
 
 @Module({
   imports: [
@@ -35,7 +39,17 @@ import { ListsModule } from './domains/lists/lists.module';
       logging: false,
       database: process.env.POSTGRES_DB,
       migrations: ["src/migration/*.js"],
-      entities: [Users, Roles, Permissions, Workplaces, Projects, Lists],
+      entities: [
+        Users,
+        Roles,
+        Permissions,
+        Workplaces,
+        Projects,
+        Lists,
+        Cards,
+        CardsActivity,
+        CardsAttachments
+      ],
       cli: {
         migrationsDir: "migration"
       }
@@ -46,7 +60,8 @@ import { ListsModule } from './domains/lists/lists.module';
     RolesModule,
     WorkplacesModule,
     ProjectsModule,
-    ListsModule
+    ListsModule,
+    CardsModule
   ],
   controllers: [],
   providers: [],

@@ -3,6 +3,7 @@ import { ListsService } from './lists.service';
 import { ListsDto } from './dto/lists.dto';
 import { Lists } from './lists.model';
 import { Projects } from '../projects/projects.model';
+import { getManager } from 'typeorm';
 
 @Controller()
 export class ListsController {
@@ -55,4 +56,25 @@ export class ListsController {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  @Post('/:listId/change-position')
+  async changePosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number) {
+    try {
+      const listEntityMoveTo = await getManager().findOne(Lists, listId);
+      let listEntityMoveFrom = new Lists();
+
+      listEntityMoveFrom.position = newPosition;
+      listEntityMoveFrom = await this.listsService.getList(listEntityMoveFrom);
+
+      if(listEntityMoveFrom)
+        listEntityMoveFrom.position = listEntityMoveTo.position;
+      listEntityMoveTo.position = newPosition;
+
+      return await this.listsService.bulkSaveLists([listEntityMoveFrom, listEntityMoveTo]);
+    } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  
 }

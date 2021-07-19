@@ -17,7 +17,7 @@ export class ListsService {
   }
 
   async getLists(project: Projects): Promise<Lists[]> {
-    return await this.listsRepository.find({ where: { project } });
+    return await this.listsRepository.find({ where: { project }, order: { position: 'ASC' } });
   }
 
   async deleteList(list: Lists): Promise<void> {
@@ -26,5 +26,13 @@ export class ListsService {
 
   async isListExists(list: Lists): Promise<boolean> {
     return await this.listsRepository.count(list) === 1;
+  }
+
+  async getList(list: Lists): Promise<Lists> {
+    return await this.listsRepository.findOne(list);
+  }
+
+  async bulkSaveLists(lists: Lists[]): Promise<any> {
+    return await this.listsRepository.save(lists);
   }
 }
