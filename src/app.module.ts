@@ -17,7 +17,7 @@ import { WorkplacesRoute } from './routes/workplaces.route';
 import { Lists } from './domains/lists/lists.model';
 import { ListsModule } from './domains/lists/lists.module';
 import { Cards } from './domains/cards/cards.model';
-import { CardsActivity } from './domains/cards/cardsActivity.model';
+import { CardsActivities } from './domains/cards/cardsActivities.model';
 import { CardsAttachments } from './domains/cards/cardsAttachments.model';
 import { CardsModule } from './domains/cards/cards.module';
 
@@ -47,7 +47,7 @@ import { CardsModule } from './domains/cards/cards.module';
         Projects,
         Lists,
         Cards,
-        CardsActivity,
+        CardsActivities,
         CardsAttachments
       ],
       cli: {

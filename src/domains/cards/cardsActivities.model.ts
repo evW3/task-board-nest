@@ -1,9 +1,8 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Projects } from '../projects/projects.model';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Cards } from './cards.model';
 
 @Entity()
-export class CardsActivity {
+export class CardsActivities {
   @PrimaryGeneratedColumn()
   id: number;
 

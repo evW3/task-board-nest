@@ -13,6 +13,22 @@ export class CardsService {
   }
 
   async getCardsByList(list: Lists): Promise<Cards[]> {
-    return await this.cardsRepository.find({ where: { list } });
+    return await this.cardsRepository.find({
+      where: { list },
+      join: {
+        alias: 'cards',
+        leftJoinAndSelect: {
+          activity: 'cards.activities'
+        }
+      }
+    });
+  }
+
+  async updateCard(card: Cards): Promise<Cards> {
+    return await this.cardsRepository.save(card);
+  }
+
+  async bulkUpdate(cards: Cards[]): Promise<Cards[]> {
+    return await this.cardsRepository.save(cards);
   }
 }

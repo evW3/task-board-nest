@@ -11,7 +11,8 @@ import { IsListExistsMiddleware } from './middlewares/isListExists.middleware';
     TypeOrmModule.forFeature([Lists])
   ],
   controllers: [ListsController],
-  providers: [ListsService]
+  providers: [ListsService],
+  exports: [ListsService]
 })
 export class ListsModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {

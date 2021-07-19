@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CardsAttachments } from './cardsAttachments.model';
-import { CardsActivity } from './cardsActivity.model';
+import { CardsActivities } from './cardsActivities.model';
 import { Users } from '../users/users.model';
 import { Lists } from '../lists/lists.model';
 
@@ -37,11 +37,10 @@ export class Cards {
   @OneToMany(() => CardsAttachments, attachment => attachment.card)
   attachments: CardsAttachments[];
 
-  @OneToMany(() => CardsActivity, activity => activity.card)
-  activities: CardsActivity[];
+  @OneToMany(() => CardsActivities, activity => activity.card)
+  activities: CardsActivities[];
 
   @ManyToMany(() => Users)
   @JoinTable({name: 'cards_members'})
   users: Users[];
-
 }

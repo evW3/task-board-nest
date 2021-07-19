@@ -6,8 +6,8 @@ export class CardsAttachments {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  attachment: string;
+  @Column({type: 'bytea'})
+  attachment: Buffer;
 
   @ManyToOne(() => Cards, card => card.attachments)
   @JoinColumn({name: 'card_id'})

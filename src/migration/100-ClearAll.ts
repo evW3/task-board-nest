@@ -10,6 +10,7 @@ import { Lists1626097862208 } from './08-Lists';
 import { Cards1626097862209 } from './09-Cards';
 import { CardsMembers1626097862210 } from './10-CardsMembers';
 import { CardsAttachments1626097862211 } from './11-CardsAttachments';
+import { CardsActivities1626097862212 } from './12-CardsActivity';
 
 
 export class ClearAll1626097862300 implements MigrationInterface {
@@ -27,7 +28,9 @@ export class ClearAll1626097862300 implements MigrationInterface {
     const cardsEntity = new Cards1626097862209();
     const cardsMembersEntity = new CardsMembers1626097862210();
     const cardsAttachmentEntity = new CardsAttachments1626097862211();
+    const cardsActivitiesEntity = new CardsActivities1626097862212();
 
+    //await cardsActivitiesEntity.down(queryRunner);
     await cardsAttachmentEntity.down(queryRunner);
     await cardsMembersEntity.down(queryRunner);
     await cardsEntity.down(queryRunner);

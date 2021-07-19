@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post } from '@nestjs/common';
 import { ListsService } from './lists.service';
 import { ListsDto } from './dto/lists.dto';
 import { Lists } from './lists.model';
@@ -57,7 +57,7 @@ export class ListsController {
     }
   }
 
-  @Post('/:listId/change-position')
+  @Patch('/:listId/change-position')
   async changePosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number) {
     try {
       const listEntityMoveTo = await getManager().findOne(Lists, listId);
@@ -75,6 +75,4 @@ export class ListsController {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }
-
-  
 }

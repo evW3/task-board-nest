@@ -17,7 +17,16 @@ export class ListsService {
   }
 
   async getLists(project: Projects): Promise<Lists[]> {
-    return await this.listsRepository.find({ where: { project }, order: { position: 'ASC' } });
+    return await this.listsRepository.find({
+      where: { project },
+      order: { position: 'ASC' },
+      join: {
+        alias: 'list',
+        leftJoinAndSelect: {
+          cards: 'list.cards'
+        }
+      }
+    });
   }
 
   async deleteList(list: Lists): Promise<void> {
