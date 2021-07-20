@@ -17,7 +17,7 @@ export class IsCanMoveListMiddleware implements NestMiddleware {
       const listId = pathArr[idxLists + 1];
       const projectId = Number.parseInt(pathArr[idxProjects + 1]);
       const listEntity = await getManager().findOne(Lists, listId);
-      const lastPosition = (await this.positionQueriesService.getMaxPosition('projects', projectId, 'lists'))[0].position;
+      const lastPosition = (await this.positionQueriesService.getMaxPosition('projects', projectId, 'lists'))[0].position || 1;
 
       if((lastPosition >= newPosition) && listEntity.position != newPosition)
         next();

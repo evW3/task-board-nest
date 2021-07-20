@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpException,
@@ -74,24 +75,19 @@ export class CardsController {
 
   @Patch('/move-all')
   async moveAllCards(@Body('listIdMoveTo') listIdMoveTo: number, @Param('listId') listId: number) {
-    try {     
-      console.log('move-all');
-       
-      // const listEntityFrom = new Lists();
-      // const listEntityTo = new Lists();
-      // let lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listIdMoveTo, 'cards'))[0].position || 0;
+    try {            
+      const listEntityFrom = new Lists();
+      const listEntityTo = new Lists();
+      let lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listIdMoveTo, 'cards'))[0].position || 0;
       
-      // console.log(lastPosition);
-      
+      listEntityFrom.id = listId;
+      listEntityTo.id = listIdMoveTo;
 
-      // listEntityFrom.id = listId;
-      // listEntityTo.id = listIdMoveTo;
+      const cardsEntities = await this.cardsService.getCardsByList(listEntityFrom);
 
-      // const cardsEntities = await this.cardsService.getCardsByList(listEntityFrom);
+      cardsEntities.map((entity: Cards) => ((entity.list = listEntityTo) && (entity.position = ++lastPosition)));
 
-      // cardsEntities.map((entity: Cards) => ((entity.list = listEntityTo) && (entity.position = ++lastPosition)));
-
-      // return await this.cardsService.bulkUpdate(cardsEntities);
+      return await this.cardsService.bulkUpdate(cardsEntities);
     } catch (e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
@@ -121,7 +117,7 @@ export class CardsController {
     try {
       const listEntity = new Lists();
       const cardEntity = await getManager().findOne(Cards, cardId);
-      await this.positionQueriesService.changePositionWithJoin('lists', changePositionDto.listIdMoveTo, 'cards', changePositionDto.newPosition);
+      await this.positionQueriesService.changePositionWithJoin('lists', changePositionDto.listIdMoveTo, 'cards', changePositionDto.newPosition, cardEntity.position);
       
       listEntity.id = changePositionDto.listIdMoveTo;
       cardEntity.list = listEntity;
@@ -157,6 +153,18 @@ export class CardsController {
 
       return await this.cardsActivityService.saveCardsActivity(cardActivityEntity);
     } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Delete('/:cardId/')
+  async deleteCard(@Param('cardId') cardId: number) {
+    try {
+        const cardEntity = await getManager().findOne(Cards, cardId);
+
+        await this.cardsService.deleteCard(cardEntity);
+        return { message: 'Card was deleted', status: HttpStatus.OK }
+    } catch(e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }

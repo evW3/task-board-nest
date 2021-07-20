@@ -80,7 +80,7 @@ export class ListsController {
   async changeListPosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number) {
     try {
       const listEntity = await getManager().findOne(Lists, listId);
-      await this.positionQueriesService.changePosition(newPosition, 'lists');
+      await this.positionQueriesService.changePosition(newPosition, 'lists', listEntity.position);
       listEntity.position = newPosition;
 
       return await this.listsService.updateList(listEntity);

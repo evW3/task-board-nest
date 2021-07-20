@@ -23,11 +23,11 @@ import { IsCanMoveCardMiddleware } from './middlewares/isCanMoveCard.middleware'
 })
 export class CardsModule implements NestModule{
   configure(consumer: MiddlewareConsumer): any {
-    consumer
-      .apply(IsCardMemberMiddleware)
-      .forRoutes(
-        { path: '**/cards/:cardId$', method: RequestMethod.ALL }
-      );
+    // consumer
+    //   .apply(IsCardMemberMiddleware)
+    //   .forRoutes(
+    //     { path: '**/cards/:cardId', method: RequestMethod.ALL }
+    //   );
     consumer
       .apply(IsListIdMoveToExistsMiddleware)
       .forRoutes(

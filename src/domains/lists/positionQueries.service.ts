@@ -7,57 +7,40 @@ export class PositionQueriesService {
 
   constructor() { this.init() }
 
-  async changePosition(positionTo: number, tableName: string): Promise<void> {
-    if(positionTo != 1) {
+  async changePosition(positionTo: number, tableName: string, positionFrom: number): Promise<void> {
       await this.queryRunner.query(`
         UPDATE ${tableName}
         SET position = position - 1
-        WHERE position <= ${positionTo}
+        WHERE position <= ${positionTo} AND position > ${positionFrom};
       `);
       await this.queryRunner.query(`
         UPDATE ${tableName}
         SET position = position + 1
         WHERE position > ${positionTo};
       `);
-    } else {
-      await this.queryRunner.query(`
-        UPDATE ${tableName}
-        SET position = position + 1
-        WHERE position >= ${positionTo};
-      `);
-    }
+
   }
 
-  async changePositionWithJoin(parentTable: string, parentId: number, childTable: string, positionTo: number) {
+  async changePositionWithJoin(parentTable: string, parentId: number, childTable: string, positionTo: number, positionFrom: number) {
     let parentIdColumnName: any = parentTable.split('').reverse();
     delete parentIdColumnName[0];
     parentIdColumnName = `${parentIdColumnName.reverse().join('')}_id`;
-
-    if(positionTo != 1) {
-      await this.queryRunner.query(`
-        UPDATE ${childTable} 
-        SET position = ${childTable}.position - 1 
-        FROM ${parentTable} 
-        JOIN ${childTable} AS c ON ${parentTable}.id = c.${parentIdColumnName} 
-        WHERE c.position <= ${positionTo} AND ${parentTable}.id=${parentId};
-      `);
-
-      await this.queryRunner.query(`
+    
+    await this.queryRunner.query(`
       UPDATE ${childTable} 
       SET position = ${childTable}.position + 1 
       FROM ${parentTable} 
       JOIN ${childTable} AS c ON ${parentTable}.id = c.${parentIdColumnName} 
       WHERE c.position > ${positionTo} AND ${parentTable}.id=${parentId};
     `);
-    } else {
-      await this.queryRunner.query(`
-        UPDATE ${childTable} 
-        SET position = ${childTable}.position + 1 
-        FROM ${parentTable} 
-        JOIN ${childTable} AS c ON ${parentTable}.id = c.${parentIdColumnName} 
-        WHERE c.position >= ${positionTo} AND ${parentTable}.id=${parentId};
-      `);
-    }
+
+    await this.queryRunner.query(`
+      UPDATE ${childTable} 
+      SET position = ${childTable}.position - 1 
+      FROM ${parentTable} 
+      JOIN ${childTable} AS c ON ${parentTable}.id = c.${parentIdColumnName} 
+      WHERE c.position <= ${positionTo} AND c.position > ${positionFrom} AND ${parentTable}.id=${parentId};
+    `);
   } 
 
   async getMaxPosition(tableName: string, projectId: number, joinTable: string) {

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Cards } from './cards.model';
 import { Repository } from 'typeorm';
 import { Lists } from '../lists/lists.model';
+import { ProjectsMembersService } from '../projects/projectsMembers.service';
 
 @Injectable()
 export class CardsService {
@@ -30,5 +31,9 @@ export class CardsService {
 
   async bulkUpdate(cards: Cards[]): Promise<Cards[]> {
     return await this.cardsRepository.save(cards);
+  }
+
+  async deleteCard(card: Cards): Promise<void> {
+    await this.cardsRepository.delete(card);
   }
 }

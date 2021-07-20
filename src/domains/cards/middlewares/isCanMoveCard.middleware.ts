@@ -14,11 +14,11 @@ export class IsCanMoveCardMiddleware implements NestMiddleware {
       const newPosition = req.body.newPosition;
       const pathArr = req.params[0].split('/');
       const idxLists = pathArr.findIndex((str: any) => str === 'lists');
-      const listId = Number.parseInt(pathArr[idxLists + 1]);
+      const listId = req.body.listIdMoveTo;
       const cardId = req.params.cardId;
       const cardEntity = await getManager().findOne(Cards, cardId);
-      const lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listId, 'cards'))[0].position;
-        
+      const lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listId, 'cards'))[0].position || 1;
+      
       if((lastPosition >= newPosition) && cardEntity.position != newPosition)
         next();
       else
