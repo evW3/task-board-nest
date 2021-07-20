@@ -4,23 +4,23 @@ import { ListsDto } from './dto/lists.dto';
 import { Lists } from './lists.model';
 import { Projects } from '../projects/projects.model';
 import { getManager } from 'typeorm';
+import { PositionQueriesService } from './positionQueries.service';
 
 @Controller()
 export class ListsController {
-  constructor(private readonly listsService: ListsService) {}
+  constructor(private readonly listsService: ListsService,
+              private readonly positionQueriesService: PositionQueriesService) {}
 
   @Post('/')
   async createList(@Body() listsDto: ListsDto, @Param('projectId') projectId: number) {
     try {
       const listEntity = new Lists();
       const projectsEntity = new Projects();
-
+      const lastPosition = (await this.positionQueriesService.getMaxPosition('projects', projectId, 'lists'))[0].position || 0;
+      
       projectsEntity.id = projectId;
       listEntity.name = listsDto.name;
-
-      if(listsDto.position)
-        listEntity.position = listsDto.position;
-
+      listEntity.position = lastPosition + 1;
       listEntity.project = projectsEntity;
 
       return await this.listsService.saveList(listEntity);
@@ -57,21 +57,34 @@ export class ListsController {
     }
   }
 
-  @Patch('/:listId/change-position')
-  async changePosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number) {
+  @Patch('/:listId/swap-list')
+  async swapList(@Body('positionToSwap') positionToSwap: number, @Param('listId') listId: number) {
     try {
       const listEntityMoveTo = await getManager().findOne(Lists, listId);
       let listEntityMoveFrom = new Lists();
 
-      listEntityMoveFrom.position = newPosition;
+      listEntityMoveFrom.position = positionToSwap;
       listEntityMoveFrom = await this.listsService.getList(listEntityMoveFrom);
 
       if(listEntityMoveFrom)
         listEntityMoveFrom.position = listEntityMoveTo.position;
-      listEntityMoveTo.position = newPosition;
+      listEntityMoveTo.position = positionToSwap;
 
       return await this.listsService.bulkSaveLists([listEntityMoveFrom, listEntityMoveTo]);
     } catch (e) {
+      throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Patch('/:listId/change-list-position')
+  async changeListPosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number) {
+    try {
+      const listEntity = await getManager().findOne(Lists, listId);
+      await this.positionQueriesService.changePosition(newPosition, 'lists');
+      listEntity.position = newPosition;
+
+      return await this.listsService.updateList(listEntity);
+    } catch(e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }
   }

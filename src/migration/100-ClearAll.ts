@@ -30,7 +30,7 @@ export class ClearAll1626097862300 implements MigrationInterface {
     const cardsAttachmentEntity = new CardsAttachments1626097862211();
     const cardsActivitiesEntity = new CardsActivities1626097862212();
 
-    //await cardsActivitiesEntity.down(queryRunner);
+    await cardsActivitiesEntity.down(queryRunner);
     await cardsAttachmentEntity.down(queryRunner);
     await cardsMembersEntity.down(queryRunner);
     await cardsEntity.down(queryRunner);

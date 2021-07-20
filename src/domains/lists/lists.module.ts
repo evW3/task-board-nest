@@ -5,14 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Lists } from './lists.model';
 import { IsNameListIsUniqueMiddleware } from './middlewares/isNameListIsUnique.middleware';
 import { IsListExistsMiddleware } from './middlewares/isListExists.middleware';
+import { PositionQueriesService } from './positionQueries.service';
+import { IsCanMoveListMiddleware } from './middlewares/isCanMoveList.middleware';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Lists])
   ],
   controllers: [ListsController],
-  providers: [ListsService],
-  exports: [ListsService]
+  providers: [ListsService, PositionQueriesService],
+  exports: [ListsService, PositionQueriesService]
 })
 export class ListsModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
@@ -25,6 +27,11 @@ export class ListsModule implements NestModule {
       .apply(IsListExistsMiddleware)
       .forRoutes(
         { path: '**/:listId$', method: RequestMethod.DELETE }
-      )
+      );
+    consumer
+      .apply(IsCanMoveListMiddleware)
+      .forRoutes(
+        { path: '**/:listId/change-list-position', method: RequestMethod.PATCH }
+      );
   }
 }

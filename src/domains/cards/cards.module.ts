@@ -7,9 +7,10 @@ import { CardsController } from './cards.controller';
 import { CardsService } from './cards.service';
 import { IsCardMemberMiddleware } from './middlewares/isCardMember.middleware';
 import { CardsMembersService } from './cardsMembers.service';
-import { IsListExistsMiddleware } from './middlewares/isListExists.middleware';
+import { IsListIdMoveToExistsMiddleware } from './middlewares/isListIdMoveToExists.middleware';
 import { ListsModule } from '../lists/lists.module';
 import { CardsActivitiesService } from './cardsActivities.service';
+import { IsCanMoveCardMiddleware } from './middlewares/isCanMoveCard.middleware';
 
 @Module({
   imports: [
@@ -28,11 +29,15 @@ export class CardsModule implements NestModule{
         { path: '**/cards/:cardId', method: RequestMethod.ALL }
       );
     consumer
-      .apply(IsListExistsMiddleware)
+      .apply(IsListIdMoveToExistsMiddleware)
       .forRoutes(
-        { path: '**/move', method: RequestMethod.PATCH },
         { path: '**/move-all', method: RequestMethod.PATCH }
       );
+    consumer
+      .apply(IsCanMoveCardMiddleware)
+      .forRoutes(
+        { path: '**/:cardId/change-card-position', method: RequestMethod.PATCH }
+      )
   }
 
 }

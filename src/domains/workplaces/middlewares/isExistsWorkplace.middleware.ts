@@ -16,7 +16,7 @@ export class IsExistsWorkplaceMiddleware implements NestMiddleware {
 
       const isExistWorkplace = await this.workplacesService.isExistsWorkplace(workplaceEntity);
 
-      if(isExistWorkplace)
+      if(isExistWorkplace)     
         next();
       else
         next(new HttpException('Can`t find workplace', HttpStatus.BAD_REQUEST));

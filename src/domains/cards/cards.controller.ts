@@ -24,12 +24,14 @@ import { CreateActivityDto } from './dto/createActivity.dto';
 import { SchemaValidatePipe } from '../../pipes/schemaValidate.pipe';
 import { CreateActivitySchema } from './schemas/createActivity.schema';
 import { CreateCardSchema } from './schemas/createCard.schema';
+import { PositionQueriesService } from '../lists/positionQueries.service';
 
 @Controller()
 export class CardsController {
   constructor(private readonly cardsService: CardsService,
               private readonly cardsMembersService: CardsMembersService,
-              private readonly cardsActivityService: CardsActivitiesService) {}
+              private readonly cardsActivityService: CardsActivitiesService,
+              private readonly positionQueriesService: PositionQueriesService) {}
 
   @Post('/')
   //@UsePipes(new SchemaValidatePipe(CreateCardSchema))
@@ -38,11 +40,13 @@ export class CardsController {
       const cardEntity = new Cards();
       const listEntity = new Lists();
       const userId = createCardDto.userId;
+      const lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listId, 'cards'))[0].position || 0;
 
       listEntity.id = listId;
       cardEntity.name = createCardDto.name;
       createCardDto.description && (cardEntity.description = createCardDto.description);
       cardEntity.list = listEntity;
+      cardEntity.position = lastPosition + 1;
       cardEntity.date_interval_from = new Date(createCardDto.date.from);
       cardEntity.date_interval_to = new Date(createCardDto.date.to);
 
@@ -70,16 +74,20 @@ export class CardsController {
 
   @Patch('/move-all')
   async moveAllCards(@Body('listIdMoveTo') listIdMoveTo: number, @Param('listId') listId: number) {
-    try {
+    try {      
       const listEntityFrom = new Lists();
       const listEntityTo = new Lists();
+      let lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listIdMoveTo, 'cards'))[0].position || 0;
+      
+      console.log(lastPosition);
+      
 
       listEntityFrom.id = listId;
       listEntityTo.id = listIdMoveTo;
 
       const cardsEntities = await this.cardsService.getCardsByList(listEntityFrom);
 
-      cardsEntities.map((entity: Cards) => (entity.list = listEntityTo));
+      cardsEntities.map((entity: Cards) => ((entity.list = listEntityTo) && (entity.position = ++lastPosition)));
 
       return await this.cardsService.bulkUpdate(cardsEntities);
     } catch (e) {
@@ -106,14 +114,16 @@ export class CardsController {
     }
   }
 
-  @Patch('/:cardId/move')
-  async moveCard(@Body('listIdMoveTo') listIdMoveTo: number, @Param('cardId') cardId: number) {
+  @Patch('/:cardId/change-card-position')
+  async moveCard(@Body() changePositionDto: any, @Param('cardId') cardId: number) {
     try {
       const listEntity = new Lists();
       const cardEntity = await getManager().findOne(Cards, cardId);
-
-      listEntity.id = listIdMoveTo;
+      await this.positionQueriesService.changePositionWithJoin('lists', changePositionDto.listIdMoveTo, 'cards', changePositionDto.newPosition);
+      
+      listEntity.id = changePositionDto.listIdMoveTo;
       cardEntity.list = listEntity;
+      cardEntity.position = changePositionDto.newPosition;
 
       return await this.cardsService.updateCard(cardEntity);
     } catch (e) {

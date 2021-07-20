@@ -20,9 +20,7 @@ export class Lists1626097862208 implements MigrationInterface {
         },
         {
           name: 'position',
-          type: 'int',
-          generationStrategy: 'increment',
-          isGenerated: true
+          type: 'int'
         }
       ]
     }), true);

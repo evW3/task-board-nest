@@ -30,6 +30,9 @@ export class Cards {
   @Column({ type: 'timestamptz' })
   date_interval_to: Date;
 
+  @Column()
+  position: number;
+
   @ManyToOne(() => Lists, list => list.cards)
   @JoinColumn({name: 'list_id'})
   list: Lists

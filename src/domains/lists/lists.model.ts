@@ -10,7 +10,7 @@ export class Lists {
   @Column()
   name: string;
 
-  @Column({ generated: 'increment' })
+  @Column()
   position: number;
 
   @ManyToOne(() => Projects, project => project.lists)

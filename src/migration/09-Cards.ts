@@ -30,6 +30,10 @@ export class Cards1626097862209 implements MigrationInterface {
         {
           name: 'date_interval_to',
           type: 'date'
+        },
+        {
+          name: 'position',
+          type: 'int'
         }
       ]
     }), true);
