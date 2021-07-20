@@ -6,8 +6,8 @@ import {
   HttpException,
   HttpStatus,
   Param, Patch,
-  Post, UploadedFile,
-  UseInterceptors,
+  Post, Req, UploadedFile,
+  UseInterceptors, UsePipes,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { Cards } from './cards.model';
@@ -15,8 +15,15 @@ import { Lists } from '../lists/lists.model';
 import { CardsMembersService } from './cardsMembers.service';
 import { getManager } from 'typeorm';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 import { CardsActivities } from './cardsActivities.model';
 import { CardsActivitiesService } from './cardsActivities.service';
+import { CreateCardDto } from './dto/createCard.dto';
+import { UpdateCardDto } from './dto/updateCard.dto';
+import { CreateActivityDto } from './dto/createActivity.dto';
+import { SchemaValidatePipe } from '../../pipes/schemaValidate.pipe';
+import { CreateActivitySchema } from './schemas/createActivity.schema';
+import { CreateCardSchema } from './schemas/createCard.schema';
 
 @Controller()
 export class CardsController {
@@ -25,7 +32,8 @@ export class CardsController {
               private readonly cardsActivityService: CardsActivitiesService) {}
 
   @Post('/')
-  async createCard(@Body() createCardDto: any, @Param('listId') listId: number) {
+  //@UsePipes(new SchemaValidatePipe(CreateCardSchema))
+  async createCard(@Body() createCardDto: CreateCardDto, @Param('listId') listId: number) {
     try {
       const cardEntity = new Cards();
       const listEntity = new Lists();
@@ -61,14 +69,13 @@ export class CardsController {
   }
 
   @Patch('/move-all')
-  async moveAllCards(@Body() moveCardDto: any, @Param('listId') listId: number) {
+  async moveAllCards(@Body('listIdMoveTo') listIdMoveTo: number, @Param('listId') listId: number) {
     try {
-      const listMoveToId = moveCardDto.listIdMoveTo;
       const listEntityFrom = new Lists();
       const listEntityTo = new Lists();
 
       listEntityFrom.id = listId;
-      listEntityTo.id = listMoveToId;
+      listEntityTo.id = listIdMoveTo;
 
       const cardsEntities = await this.cardsService.getCardsByList(listEntityFrom);
 
@@ -81,7 +88,7 @@ export class CardsController {
   }
 
   @Patch('/:cardId/')
-  async updateCard(@Body() updateCardDto: any, @Param('cardId') cardId: number) {
+  async updateCard(@Body() updateCardDto: UpdateCardDto, @Param('cardId') cardId: number) {
     try {
       const cardEntity = await getManager().findOne(Cards, cardId);
 
@@ -100,13 +107,12 @@ export class CardsController {
   }
 
   @Patch('/:cardId/move')
-  async moveCard(@Body() moveCardDto: any, @Param('cardId') cardId: number) {
+  async moveCard(@Body('listIdMoveTo') listIdMoveTo: number, @Param('cardId') cardId: number) {
     try {
-      const listMoveToId = moveCardDto.listIdMoveTo;
       const listEntity = new Lists();
       const cardEntity = await getManager().findOne(Cards, cardId);
 
-      listEntity.id = listMoveToId;
+      listEntity.id = listIdMoveTo;
       cardEntity.list = listEntity;
 
       return await this.cardsService.updateCard(cardEntity);
@@ -126,12 +132,13 @@ export class CardsController {
   }
 
   @Post('/:cardId/activity')
-  async createActivity(@Body() createActivityDto: any, @Param('cardId') cardId: number) {
+  @UsePipes(new SchemaValidatePipe(CreateActivitySchema))
+  async createActivity(@Body() createActivityDto: CreateActivityDto, @Req() req: Request) {
     try {
       const cardActivityEntity = new CardsActivities();
       const cardEntity = new Cards();
 
-      cardEntity.id = cardId;
+      cardEntity.id = Number.parseInt(req.params.cardId);
       cardActivityEntity.card = cardEntity;
       cardActivityEntity.message = createActivityDto.message;
       cardActivityEntity.date = new Date(createActivityDto.date);

@@ -8,7 +8,6 @@ export class IsUserOwnerMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log('IsUserOwnerMiddleware');
       const userId = req?.body?.userId;
       const projectId = Number.parseInt(req?.params.projectId);
       const isUserOwner = this.usersQueryRunnerService.getProjectOwner(userId, projectId);

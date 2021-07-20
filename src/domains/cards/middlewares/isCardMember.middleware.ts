@@ -12,6 +12,7 @@ export class IsCardMemberMiddleware implements NestMiddleware {
       const userId = req?.body?.userId;
       const cardId = Number.parseInt(req?.params?.cardId);
       const isUserAreMember = await this.cardsMembersService.findCardMember(userId, cardId);
+
       if(isUserAreMember.length >= 1)
         next();
       else

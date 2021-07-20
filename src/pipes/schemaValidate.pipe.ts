@@ -9,13 +9,14 @@ import { ObjectSchema } from 'joi';
 
 @Injectable()
 export class SchemaValidatePipe implements PipeTransform {
-    constructor(private schema: ObjectSchema) {}
+  constructor(private schema: ObjectSchema) {}
 
-    transform(value: unknown, metadata: ArgumentMetadata) {
-        const { error } = this.schema.validate(value);
-        if (error) {
-            throw new HttpException('The expected request body does not match the received one', HttpStatus.BAD_REQUEST);
-        }
-        return value;
+  transform(value1: unknown, metadata: ArgumentMetadata) {
+    const { error } = this.schema.validate(value1);
+    if (error) {
+      console.log(error);
+      throw new HttpException('The expected request body does not match the received one', HttpStatus.BAD_REQUEST);
     }
+    return value1;
+  }
 }
