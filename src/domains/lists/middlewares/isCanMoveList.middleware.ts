@@ -24,6 +24,8 @@ export class IsCanMoveListMiddleware implements NestMiddleware {
       else
         next(new HttpException('Can`t move list', HttpStatus.BAD_REQUEST));
     } catch (e) {
+      console.log(e);
+      
       if(e instanceof HttpException)
         next(e);
       else

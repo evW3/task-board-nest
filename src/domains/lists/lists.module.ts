@@ -22,7 +22,7 @@ export class ListsModule implements NestModule {
       .apply(IsNameListIsUniqueMiddleware)
       .forRoutes(
         { path: '**/lists$', method: RequestMethod.POST }
-        )
+      );
     consumer
       .apply(IsListExistsMiddleware)
       .forRoutes(

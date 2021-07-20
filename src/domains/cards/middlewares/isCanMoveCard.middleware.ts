@@ -10,6 +10,7 @@ export class IsCanMoveCardMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
+      
       const newPosition = req.body.newPosition;
       const pathArr = req.params[0].split('/');
       const idxLists = pathArr.findIndex((str: any) => str === 'lists');
