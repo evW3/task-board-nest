@@ -572,7 +572,7 @@
 								}
 							]
 						},
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "raw",
@@ -645,6 +645,219 @@
 								"lists",
 								"1",
 								"cards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get cards",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:5000/workplaces/1/projects/1/lists/2/cards",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"workplaces",
+								"1",
+								"projects",
+								"1",
+								"lists",
+								"2",
+								"cards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "move card",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"listIdMoveTo\": \"2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:5000/workplaces/1/projects/1/lists/1/cards/2/move",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"workplaces",
+								"1",
+								"projects",
+								"1",
+								"lists",
+								"1",
+								"cards",
+								"2",
+								"move"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create activity",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"message\": \"i don`t think that i can do this\",\r\n    \"date\": \"Sun Jul 19 2021 9:03:35 GMT-0600\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:5000/workplaces/1/projects/1/lists/1/cards/2/activity",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"workplaces",
+								"1",
+								"projects",
+								"1",
+								"lists",
+								"1",
+								"cards",
+								"2",
+								"activity"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "move all cards",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"listIdMoveTo\": \"2\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:5000/workplaces/1/projects/1/lists/1/cards/move-all",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"workplaces",
+								"1",
+								"projects",
+								"1",
+								"lists",
+								"1",
+								"cards",
+								"move-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update card",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"OHH DAMN\",\r\n    \"description\": \"VERY LARGE TROUBLES\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:5000/workplaces/1/projects/1/lists/1/cards/1/",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"workplaces",
+								"1",
+								"projects",
+								"1",
+								"lists",
+								"1",
+								"cards",
+								"1",
+								""
 							]
 						}
 					},
