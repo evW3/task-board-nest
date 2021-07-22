@@ -16,8 +16,8 @@ export class ListsController {
     try {
       const listEntity = new Lists();
       const projectsEntity = new Projects();
-      const lastPosition = (await this.positionQueriesService.getMaxPosition('projects', projectId, 'lists'))[0].position || 0;
-      
+      const lastPosition = (await this.positionQueriesService.getMaxOrMinPosition('projects', projectId, 'lists', 'MAX'))[0].position || 0;
+
       projectsEntity.id = projectId;
       listEntity.name = listsDto.name;
       listEntity.position = lastPosition + 1;

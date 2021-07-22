@@ -17,7 +17,7 @@ export class IsCanMoveCardMiddleware implements NestMiddleware {
       const listId = req.body.listIdMoveTo;
       const cardId = req.params.cardId;
       const cardEntity = await getManager().findOne(Cards, cardId);
-      const lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listId, 'cards'))[0].position || 1;
+      const lastPosition = (await this.positionQueriesService.getMaxOrMinPosition('lists', listId, 'cards', 'MAX'))[0].position || 1;
       
       if((lastPosition >= newPosition) && cardEntity.position != newPosition)
         next();

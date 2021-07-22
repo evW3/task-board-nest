@@ -41,7 +41,7 @@ export class CardsController {
       const cardEntity = new Cards();
       const listEntity = new Lists();
       const userId = createCardDto.userId;
-      const lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listId, 'cards'))[0].position || 0;
+      const lastPosition = (await this.positionQueriesService.getMaxOrMinPosition('lists', listId, 'cards', 'MAX'))[0].position || 0;
 
       listEntity.id = listId;
       cardEntity.name = createCardDto.name;
@@ -78,7 +78,7 @@ export class CardsController {
     try {            
       const listEntityFrom = new Lists();
       const listEntityTo = new Lists();
-      let lastPosition = (await this.positionQueriesService.getMaxPosition('lists', listIdMoveTo, 'cards'))[0].position || 0;
+      let lastPosition = (await this.positionQueriesService.getMaxOrMinPosition('lists', listIdMoveTo, 'cards', 'MAX'))[0].position || 0;
       
       listEntityFrom.id = listId;
       listEntityTo.id = listIdMoveTo;

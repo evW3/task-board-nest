@@ -43,13 +43,13 @@ export class PositionQueriesService {
     `);
   } 
 
-  async getMaxPosition(tableName: string, projectId: number, joinTable: string) {
+  async getMaxOrMinPosition(tableName: string, projectId: number, joinTable: string, MaxMin: string) {
     let tableId: any = tableName.split('').reverse();
     delete tableId[0];
     tableId = `${tableId.reverse().join('')}_id`;
     
     return await this.queryRunner.query(`
-      SELECT MAX(jt.position) AS position 
+      SELECT ${MaxMin}(jt.position) AS position 
       FROM ${tableName}
       JOIN ${joinTable} AS jt ON ${tableName}.id = jt.${tableId}
       WHERE ${tableName}.id = ${projectId}
