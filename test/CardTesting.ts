@@ -33,41 +33,17 @@ export class CardTesting {
     return response.body;
   }
 
-  async changeListPositionCheck(lists: Lists[], token: string) {
-    const idListToMove = lists[0].id;
-    let idx = lists.length;
-    let selectedListsFromDb: Lists[] = [];
-
-    for(let list of lists) {
-      let changeListPositionDto = { newPosition: idx };
-
-      await this.sendChangeListPositionRequest(
-        changeListPositionDto,
-        idListToMove,
-        HttpStatus.OK,
-        token
-      );
-
-      selectedListsFromDb = await this.sendGetListsRequest(HttpStatus.OK, token);
-
-      if(!this.simpleCheckPositions(selectedListsFromDb)) {
-        throw 'Checkout position error'
-      }
-
-      idx--;
-    }
-  }
-
-  async sendChangeListPositionRequest(
-    changeListPositionDto: any,
+  async sendUpdateCardRequest(
+    updateCardDto: any,
+    cardId: number,
     listId: number,
     expectStatus: HttpStatus,
     token: string
   ) {
     const response = await request(this.app.getHttpServer())
-      .patch(`${this.createPath()}/lists/${listId}/change-list-position`)
+      .patch(`${this.createPath()}/lists/${listId}/cards/${cardId}`)
       .set({ Authorization: `Bearer ${token}` })
-      .send(changeListPositionDto)
+      .send(updateCardDto)
       .expect(expectStatus);
 
     return response.body;
@@ -81,37 +57,17 @@ export class CardTesting {
     return response.body;
   }
 
-  private simpleCheckPositions(lists: Lists[]) {
-    let idx = 1;
-    for(let list of lists) {
-      if(lists.findIndex((list: any) => list.position === idx) === -1) {
-        return false;
-      }
-      idx++;
-    }
-    return true;
-  }
-
-  async sendDeleteListRequest(listId: number, expectStatus: HttpStatus, token: string) {
+  async sendDeleteCardRequest(
+    listId: number,
+    cardId: number,
+    expectStatus: HttpStatus,
+    token: string,
+    ) {
     const response = await request(this.app.getHttpServer())
-      .delete(`${this.createPath()}/lists/${listId}`)
+      .delete(`${this.createPath()}/lists/${listId}/cards/${cardId}`)
       .set({ Authorization: `Bearer ${token}` })
       .expect(expectStatus);
-
     return response.body;
   }
 
-  async bulkCreateLists(createListDtos: any[], expectStatus: HttpStatus, token: string) {
-    let lists: Lists[] = [];
-
-    for(let createListDto of createListDtos) {
-      let response = await request(this.app.getHttpServer())
-        .post(`${this.createPath()}/lists/`)
-        .set({ Authorization: `Bearer ${token}` })
-        .send(createListDto)
-        .expect(expectStatus);
-      lists.push(response.body);
-    }
-    return lists;
-  }
 }

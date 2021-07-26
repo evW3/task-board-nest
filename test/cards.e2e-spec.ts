@@ -20,7 +20,8 @@ describe('Cards', () => {
   const mockUser = mockUsers[0];
   const mockProject = mockProjects[0];
   const innerMockLists = [mockLists[0], mockLists[1]];
-  const mockCards = [mockCard, mockCard, mockCard, mockCard, mockCard, mockCard]
+  const mockCards = [mockCard, mockCard, mockCard, mockCard, mockCard, mockCard];
+  const mockUpdateCard = { name: 'OHH DAMN', description: 'VERY LARGE TROUBLES' };
 
   const initTestingClasses = (app: INestApplication) => {
     authTesting = new AuthTesting(app);
@@ -87,14 +88,29 @@ describe('Cards', () => {
 
       counter++;
     }
-    console.log(cardsEntities);
     done();
   });
 
   it('Should update card', async (done) => {
-
+    cardsEntities[0] = await cardTesting.sendUpdateCardRequest(
+      mockUpdateCard,
+      cardsEntities[0].id,
+      listsEntities[0].id,
+      HttpStatus.OK,
+      userToken
+    );
     done();
   });
+
+  it('Should delete card', async (done) => {
+    await cardTesting.sendDeleteCardRequest(
+      listsEntities[0].id,
+      cardsEntities[0].id,
+      HttpStatus.OK,
+      userToken
+    );
+    done();
+  })
 
   afterAll(async (done) => {
     try {
