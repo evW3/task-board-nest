@@ -49,12 +49,26 @@ export class CardTesting {
     return response.body;
   }
 
-  async sendGetListsRequest(expectStatus: HttpStatus, token: string) {
+  async sendGetCardsRequest(
+    listId: number,
+    expectStatus: HttpStatus,
+    token: string) {
     const response = await request(this.app.getHttpServer())
-      .get(`${this.createPath()}/lists/`)
+      .get(`${this.createPath()}/lists/${listId}/cards/`)
       .set({ Authorization: `Bearer ${token}` })
-      .expect(expectStatus)
+      .expect(expectStatus);
     return response.body;
+  }
+
+  async changeCardPositionCheck(
+    lists: Lists[],
+    token: string,
+    idxCardToMove: number,
+    idxListToMove: number
+  ) {
+    for(let list of lists) {
+
+    }
   }
 
   async sendDeleteCardRequest(

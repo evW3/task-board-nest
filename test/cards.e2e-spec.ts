@@ -102,6 +102,12 @@ describe('Cards', () => {
     done();
   });
 
+  it('Should change card position', async (done) => {
+    const lists = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+    await cardTesting.changeCardPositionCheck(lists, userToken);
+    done();
+  });
+
   it('Should delete card', async (done) => {
     await cardTesting.sendDeleteCardRequest(
       listsEntities[0].id,
@@ -110,7 +116,7 @@ describe('Cards', () => {
       userToken
     );
     done();
-  })
+  });
 
   afterAll(async (done) => {
     try {
