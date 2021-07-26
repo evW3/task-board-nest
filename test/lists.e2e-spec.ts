@@ -1,6 +1,5 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { mockLists, mockProjects, mockUsers, mockWorkplaces } from '../src/utils/mockConstants';
-import { Connection } from 'typeorm';
 import { Workplaces } from '../src/domains/workplaces/workplaces.model';
 import { Projects } from '../src/domains/projects/projects.model';
 import { Lists } from '../src/domains/lists/lists.model';
@@ -9,8 +8,6 @@ import { AuthTesting } from './AuthTesting';
 import { WorkplaceTesting } from './WorkplaceTesting';
 import { ProjectTesting } from './ProjectTesting';
 import { ListTesting } from './ListTesting';
-
-const request = require('supertest')
 
 describe('Project', () => {
   const mockUser = mockUsers[4];
@@ -66,23 +63,26 @@ describe('Project', () => {
     done();
   });
 
-  it('Should change lists position', async (done) => {
+  it('Should change list position', async (done) => {
     try {
-      await listTesting.changeListPositionCheck(listEntities, userToken);
+      await listTesting
+        .changeListPositionCheck(listEntities, userToken);
     } catch (e) {
       throw e;
     }
     done();
   });
 
-  // it('Should delete list', async (done) => {
-  //   await request(app.getHttpServer())
-  //     .delete(`/workplaces/${workplaceEntity.id}/projects/${projectEntity.id}/lists/${listEntities[0].id}/`)
-  //     .set({ 'Authorization': `Bearer ${userToken}` })
-  //     .send(mockList)
-  //     .expect(HttpStatus.OK);
-  //   done();
-  // });
+  it('Should delete list', async (done) => {
+    await listTesting
+      .sendDeleteListRequest(listEntities[0].id, HttpStatus.OK, userToken);
+    done();
+  });
+
+  it('Should get lists', async (done) => {
+    await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+    done();
+  });
 
   afterAll(async (done) => {
     try {

@@ -1,139 +1,115 @@
-import { Test, TestingModule } from '@nestjs/testing';
-
-const request = require('supertest')
-import { Users } from '../src/domains/users/users.model';
-import { AppModule } from '../src/app.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Workplaces } from '../src/domains/workplaces/workplaces.model';
-import { Connection } from 'typeorm';
 import { Projects } from '../src/domains/projects/projects.model';
 import { Lists } from '../src/domains/lists/lists.model';
 import { Cards } from '../src/domains/cards/cards.model';
-import {
-  mockCard,
-  mockLists,
-  mockProjects,
-  mockUsers,
-  mockWorkplaces,
-} from '../src/utils/mockConstants';
+import { mockCard, mockLists, mockProjects, mockUsers, mockWorkplaces } from '../src/utils/mockConstants';
+import { AppTesting } from './AppTesting';
+import { AuthTesting } from './AuthTesting';
+import { WorkplaceTesting } from './WorkplaceTesting';
+import { ProjectTesting } from './ProjectTesting';
+import { ListTesting } from './ListTesting';
+import { CardTesting } from './CardTesting';
+
+const request = require('supertest')
 
 let app: INestApplication;
 
 describe('Cards', () => {
-  let userToken: string;
   const mockWorkplace = mockWorkplaces[0];
   const mockUser = mockUsers[0];
   const mockProject = mockProjects[0];
+  const innerMockLists = [mockLists[0], mockLists[1]];
+  const mockCards = [mockCard, mockCard, mockCard, mockCard, mockCard, mockCard]
+
+  const initTestingClasses = (app: INestApplication) => {
+    authTesting = new AuthTesting(app);
+    workplaceTesting = new WorkplaceTesting(app);
+  }
+
+  let appTesting: AppTesting;
+  let authTesting: AuthTesting;
+  let workplaceTesting: WorkplaceTesting;
+  let projectTesting: ProjectTesting;
+  let listTesting: ListTesting;
+  let cardTesting: CardTesting;
+
+  let userToken: string;
   let workplaceEntity: Workplaces;
-  let userEntity: Users;
   let projectEntity: Projects;
   let listsEntities: Lists[] = [];
   let cardsEntities: Cards[] = [];
 
   beforeAll(async (done) => {
     try {
-      const moduleFixture: TestingModule = await Test.createTestingModule({
-        imports: [AppModule],
-      }).compile();
+      appTesting = new AppTesting();
+      await appTesting.startTestServer();
 
-      app = moduleFixture.createNestApplication();
-      await app.init();
+      initTestingClasses(appTesting.app);
 
-      const authResponse = await request(app.getHttpServer())
-        .post('/auth/sign-up')
-        .send(mockUser)
-        .expect(HttpStatus.CREATED)
-      userToken = authResponse.body.token;
+      userToken = await authTesting
+        .sendRegisterRequest(mockUser, HttpStatus.CREATED);
 
-      const usersResponse = await request(app.getHttpServer())
-        .get('/users')
-        .set({ 'Authorization': `Bearer ${userToken}` });
-      userEntity = usersResponse.body;
+      workplaceEntity = await workplaceTesting
+        .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
 
-      const workplaceResponse = await request(app.getHttpServer())
-        .post('/workplaces')
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockWorkplace)
-        .expect(HttpStatus.CREATED)
-      workplaceEntity = workplaceResponse.body;
+      projectTesting = new ProjectTesting(appTesting.app, workplaceEntity.id);
 
-      const projectResponse = await request(app.getHttpServer())
-        .post(`/workplaces/${workplaceEntity.id}/projects`)
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockProject)
-        .expect(HttpStatus.CREATED);
-      projectEntity = projectResponse.body;
+      projectEntity = await projectTesting
+        .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
 
-      let listResponse = await request(app.getHttpServer())
-        .post(`/workplaces/${workplaceEntity.id}/projects/${projectEntity.id}/lists`)
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockLists[0])
-        .expect(HttpStatus.CREATED)
-      listsEntities.push(listResponse.body);
+      listTesting = new ListTesting(appTesting.app, workplaceEntity.id, projectEntity.id);
+      cardTesting = new CardTesting(appTesting.app, workplaceEntity.id, projectEntity.id);
 
-      listResponse = await request(app.getHttpServer())
-        .post(`/workplaces/${workplaceEntity.id}/projects/${projectEntity.id}/lists`)
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockLists[1])
-        .expect(HttpStatus.CREATED)
-      listsEntities.push(listResponse.body);
-
-      let cardsResponse = await request(app.getHttpServer())
-        .post(`/workplaces/${workplaceEntity.id}/projects/${projectEntity.id}/lists/${listsEntities[0].id}/cards`)
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockCard)
-        .expect(HttpStatus.CREATED);
-      cardsEntities.push(cardsResponse.body);
-
-      cardsResponse = await request(app.getHttpServer())
-        .post(`/workplaces/${workplaceEntity.id}/projects/${projectEntity.id}/lists/${listsEntities[0].id}/cards`)
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockCard)
-        .expect(HttpStatus.CREATED);
-      cardsEntities.push(cardsResponse.body);
-
-      cardsResponse = await request(app.getHttpServer())
-        .post(`/workplaces/${workplaceEntity.id}/projects/${projectEntity.id}/lists/${listsEntities[0].id}/cards`)
-        .set({ 'Authorization': `Bearer ${userToken}` })
-        .send(mockCard)
-        .expect(HttpStatus.CREATED);
-      cardsEntities.push(cardsResponse.body);
+      listsEntities = await listTesting
+        .bulkCreateLists(innerMockLists, HttpStatus.CREATED, userToken);
 
       done();
     } catch (e) {
-      console.log(e);
+      throw e;
     }
   });
 
-  it('test', async (done) => {
-    // const connection = app.get(Connection);
-    //
-    // console.log(await connection.getRepository(Lists).find());
+  it('Should create cards', async (done) => {
+    let counter = 1;
+    let listIdx = 0;
+
+    for(let mockCard of mockCards) {
+
+      if(counter === ((~~(mockCards.length / listsEntities.length)) + 1)) {
+        listIdx++;
+      }
+
+      cardsEntities.push(
+        await cardTesting
+          .sendCreateCardRequest(mockCard, listsEntities[listIdx].id, HttpStatus.CREATED, userToken)
+      );
+
+      counter++;
+    }
+    console.log(cardsEntities);
+    done();
+  });
+
+  it('Should update card', async (done) => {
+
     done();
   });
 
   afterAll(async (done) => {
-    const connection = app.get(Connection);
+    try {
+      const connection = appTesting.getConnection();
 
-    // await connection
-    //   .getRepository(Cards)
-    //   .remove(cardsEntities);
-    //
-    // await connection
-    //   .getRepository(Lists)
-    //   .remove(listsEntities);
-    //
-    // await connection
-    //   .getRepository(Projects)
-    //   .remove(projectEntity);
-    //
-    // await connection
-    //   .getRepository(Workplaces)
-    //   .remove(workplaceEntity);
-
-    await connection
-      .getRepository(Users)
-      .remove(userEntity);
+      await connection
+        .createQueryRunner()
+        .query(`
+          DELETE
+          FROM users
+          WHERE email='${mockUser.email}';
+       `);
+    } catch (e) {
+      throw e;
+    }
 
     done();
   });

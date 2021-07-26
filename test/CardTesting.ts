@@ -3,7 +3,7 @@ import { Lists } from '../src/domains/lists/lists.model';
 
 const request = require('supertest');
 
-export class ListTesting {
+export class CardTesting {
   private app: INestApplication;
   private readonly workplaceId: number;
   private readonly projectId: number;
@@ -15,14 +15,19 @@ export class ListTesting {
   }
 
   private createPath() {
-    return `/workplaces/${this.workplaceId}/projects/${this.projectId}`
+    return `/workplaces/${this.workplaceId}/projects/${this.projectId}`;
   }
 
-  async sendCreateListRequest(createListDto: any, expectStatus: HttpStatus, token: string) {
+  async sendCreateCardRequest(
+    createCardDto: any,
+    listId: number,
+    expectStatus: HttpStatus,
+    token: string
+  ) {
     const response = await request(this.app.getHttpServer())
-      .post(`${this.createPath()}/lists/`)
+      .post(`${this.createPath()}/lists/${listId}/cards/`)
       .set({ Authorization: `Bearer ${token}` })
-      .send(createListDto)
+      .send(createCardDto)
       .expect(expectStatus);
 
     return response.body;
