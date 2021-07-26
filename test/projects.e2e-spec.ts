@@ -48,7 +48,6 @@ describe('Project', () => {
   it('Should create project', async (done) => {
     projectEntity = await projectTesting
       .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
-
     done();
   });
 

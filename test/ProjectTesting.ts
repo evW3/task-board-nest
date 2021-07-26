@@ -7,7 +7,6 @@ export class ProjectTesting {
 
   constructor(app: INestApplication, workplaceId: number) {
     this.app = app;
-    console.log(workplaceId);
     this.workplaceId = workplaceId;
   }
 
