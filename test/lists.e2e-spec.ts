@@ -1,11 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { mockLists, mockProjects, mockUsers, mockWorkplaces } from '../src/utils/mockConstants';
 import { Connection } from 'typeorm';
 import { Workplaces } from '../src/domains/workplaces/workplaces.model';
 import { Projects } from '../src/domains/projects/projects.model';
 import { Lists } from '../src/domains/lists/lists.model';
+import { AppTesting } from './AppTesting';
+import { AuthTesting } from './AuthTesting';
+import { WorkplaceTesting } from './WorkplaceTesting';
+import { ProjectTesting } from './ProjectTesting';
+
 const request = require('supertest')
 
 describe('Project', () => {
@@ -16,38 +19,38 @@ describe('Project', () => {
   const mockList = mockLists[2];
   const mockList1 = mockLists[3];
   const mockList2 = mockLists[4];
+
+  const initTestingClasses = (app: INestApplication) => {
+    authTesting = new AuthTesting(app);
+    workplaceTesting = new WorkplaceTesting(app);
+  }
+
+  let appTesting: AppTesting;
+  let authTesting: AuthTesting;
+  let workplaceTesting: WorkplaceTesting;
+  let projectTesting: ProjectTesting;
+
   let workplaceEntity: Workplaces;
   let projectEntity: Projects;
   let listEntities: Lists[] = [];
   let userToken: string;
 
   beforeAll(async (done) => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+    appTesting = new AppTesting();
+    await appTesting.startTestServer();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    initTestingClasses(appTesting.app);
 
-    const authResponse = await request(app.getHttpServer())
-      .post('/auth/sign-up')
-      .send(mockUser)
-      .expect(HttpStatus.CREATED)
-    userToken = authResponse.body.token;
+    userToken = await authTesting
+      .sendRegisterRequest(mockUser, HttpStatus.CREATED);
 
-    const workplaceResponse = await request(app.getHttpServer())
-      .post('/workplaces')
-      .set({ 'Authorization': `Bearer ${userToken}` })
-      .send(mockWorkplace)
-      .expect(HttpStatus.CREATED);
-    workplaceEntity = workplaceResponse.body;
+    workplaceEntity = await workplaceTesting
+      .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
 
-    const projectResponse = await request(app.getHttpServer())
-      .post(`/workplaces/${workplaceEntity.id}/projects`)
-      .set({ 'Authorization': `Bearer ${userToken}` })
-      .send(mockProject)
-      .expect(HttpStatus.CREATED);
-    projectEntity = projectResponse.body;
+    projectTesting = new ProjectTesting(appTesting.app, workplaceEntity.id);
+
+    projectEntity = await projectTesting
+      .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
 
     done();
   });
@@ -92,7 +95,7 @@ describe('Project', () => {
     listEntities = response.body;
 
     if(!simpleCheckPositions(listEntities)) {
-      done('Error');
+      done('change position error');
     }
 
     await request(app.getHttpServer())
@@ -108,7 +111,7 @@ describe('Project', () => {
     listEntities = response.body;
 
     if(!simpleCheckPositions(listEntities)) {
-      done('Error');
+     done('change position error');
     }
 
     done();
@@ -141,13 +144,12 @@ describe('Project', () => {
 })
 
 function simpleCheckPositions(lists: Lists[]) {
+  let idx = 1;
   for(let list of lists) {
-    let idx = 1;
     if(lists.findIndex((list: any) => list.position === idx) === -1) {
       return false;
     }
     idx++;
   }
-  console.log('\n');
   return true;
 }
