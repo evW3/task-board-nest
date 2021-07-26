@@ -10,7 +10,6 @@ export class IsProjectNotExistsMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log('2');
       const projectName = req?.body?.name;
       const projectEntity = new Projects();
       const workplaceId = Number.parseInt(req?.params[0].split('/').reverse()[0]);

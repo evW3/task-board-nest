@@ -113,12 +113,33 @@ export class CardsController {
   }
 
   @Patch('/:cardId/change-card-position')
-  async moveCard(@Body() changePositionDto: any, @Param('cardId') cardId: number) {
+  async moveCard(@Body() changePositionDto: any, @Param('cardId') cardId: number, @Req() req: Request) {
     try {
       const listEntity = new Lists();
+      const listId = Number.parseInt(req.params.listId);
       const cardEntity = await getManager().findOne(Cards, cardId);
-      await this.positionQueriesService.changePositionWithJoin('lists', changePositionDto.listIdMoveTo, 'cards', changePositionDto.newPosition, cardEntity.position);
-      
+      const isPositionPlaceEmpty = await this.positionQueriesService.getEntityByPosition('lists', 'cards', changePositionDto.listIdMoveTo, cardEntity.position);
+
+      // console.log(isPositionPlaceEmpty);
+      // console.log(listId, ' listId');
+      // console.log(changePositionDto.listIdMoveTo, ' changePositionDto.listIdMoveTo');
+      // console.log((listId === changePositionDto.listIdMoveTo) && (isPositionPlaceEmpty.length != 0));
+
+      if(listId != changePositionDto.listIdMoveTo) {
+        console.log('1');
+        // console.log(cardEntity);
+        await this.positionQueriesService.decreaseOrIncreaseInPositions('lists', 'cards', listId, cardEntity.position, true);
+        //console.log(await this.positionQueriesService.test());
+        if(isPositionPlaceEmpty.length != 0) {
+          console.log('2');
+          await this.positionQueriesService.decreaseOrIncreaseInPositions('lists', 'cards', changePositionDto.listIdMoveTo, changePositionDto.newPosition, false)
+          // console.log(await this.positionQueriesService.test());
+        }
+      } else if((listId === changePositionDto.listIdMoveTo) && (isPositionPlaceEmpty.length != 0)) {
+        console.log('3');
+        await this.positionQueriesService.changePositionWithJoin('lists', changePositionDto.listIdMoveTo, 'cards', changePositionDto.newPosition, cardEntity.position);
+      }
+
       listEntity.id = changePositionDto.listIdMoveTo;
       cardEntity.list = listEntity;
       cardEntity.position = changePositionDto.newPosition;

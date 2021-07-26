@@ -26,12 +26,12 @@ export class ListsModule implements NestModule {
     consumer
       .apply(IsListExistsMiddleware)
       .forRoutes(
-        { path: '**/:listId$', method: RequestMethod.DELETE }
+        { path: '**/lists/:listId$', method: RequestMethod.DELETE }
       );
     consumer
       .apply(IsCanMoveListMiddleware)
       .forRoutes(
-        { path: '**/:listId/change-list-position', method: RequestMethod.PATCH }
+        { path: '**/lists/:listId/change-list-position$', method: RequestMethod.PATCH }
       );
   }
 }

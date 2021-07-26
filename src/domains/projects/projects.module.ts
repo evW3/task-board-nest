@@ -31,13 +31,13 @@ export class ProjectsModule implements NestModule {
        )
     consumer
       .apply(IsProjectNotExistsMiddleware)
-      .forRoutes({ path: '**/projects', method: RequestMethod.POST });
+      .forRoutes({ path: '**/projects$', method: RequestMethod.POST });
     consumer
       .apply(IsProjectExistsMiddleware)
       .forRoutes({ path: '**/projects/:projectId/**', method: RequestMethod.ALL });
     consumer
       .apply(IsUsersCanBeAddedToProjectMiddleware)
-      .forRoutes({ path: '**/projects/:projectId/add-member', method: RequestMethod.POST })
+      .forRoutes({ path: '**/projects/:projectId/add-member$', method: RequestMethod.POST })
   }
 
 }

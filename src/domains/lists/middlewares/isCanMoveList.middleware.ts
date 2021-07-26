@@ -12,9 +12,8 @@ export class IsCanMoveListMiddleware implements NestMiddleware {
     try {
       const newPosition = req.body.newPosition;
       const pathArr = req.params[0].split('/');
-      const idxLists = pathArr.findIndex((str: any) => str === 'lists');
       const idxProjects = pathArr.findIndex((str: any) => str === 'projects');
-      const listId = pathArr[idxLists + 1];
+      const listId = req.params.listId;
       const projectId = Number.parseInt(pathArr[idxProjects + 1]);
       const listEntity = await getManager().findOne(Lists, listId);
       const lastPosition = (await this.positionQueriesService.getMaxOrMinPosition('projects', projectId, 'lists', 'MAX'))[0].position || 1;
@@ -24,8 +23,6 @@ export class IsCanMoveListMiddleware implements NestMiddleware {
       else
         next(new HttpException('Can`t move list', HttpStatus.BAD_REQUEST));
     } catch (e) {
-      console.log(e);
-      
       if(e instanceof HttpException)
         next(e);
       else

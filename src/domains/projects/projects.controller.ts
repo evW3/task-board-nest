@@ -3,7 +3,6 @@ import { ProjectsService } from './projects.service';
 import { Projects } from './projects.model';
 import { Workplaces } from '../workplaces/workplaces.model';
 import { getManager } from 'typeorm';
-import { Users } from '../users/users.model';
 import { UsersService } from '../users/users.service';
 import { ProjectsMembersService } from './projectsMembers.service';
 import { ProjectDto } from './dto/project.dto';

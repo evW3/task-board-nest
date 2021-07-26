@@ -11,7 +11,6 @@ import {
 import { Workplaces } from '../workplaces/workplaces.model';
 import { Users } from '../users/users.model';
 import { Lists } from '../lists/lists.model';
-import { Cards } from '../cards/cards.model';
 
 @Entity()
 export class Projects {
@@ -26,7 +25,11 @@ export class Projects {
   workplace: Workplaces;
 
   @ManyToMany(() => Users)
-  @JoinTable({name: 'projects_members'})
+  @JoinTable({
+    name: 'projects_members',
+    joinColumn: {name: 'project_id', referencedColumnName: 'id'},
+    inverseJoinColumn: {name: 'user_id', referencedColumnName: 'id'}
+  })
   users: Users[];
 
   @OneToMany(() => Lists, list => list.project)

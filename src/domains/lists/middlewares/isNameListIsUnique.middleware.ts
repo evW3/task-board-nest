@@ -26,7 +26,6 @@ export class IsNameListIsUniqueMiddleware implements NestMiddleware {
       else
         next(new HttpException('List with this name already exists', HttpStatus.BAD_REQUEST));
     } catch (e) {
-      console.log(e);
       if(e instanceof HttpException)
         next(e);
       else

@@ -10,7 +10,6 @@ export class IsListIdMoveToExistsMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      
       const listIdMoveTo = req?.body?.listIdMoveTo;
       const listEntity = new Lists();
 

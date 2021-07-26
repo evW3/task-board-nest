@@ -22,19 +22,22 @@ export class WorkplacesModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(TokenMiddleware)
-      .forRoutes({ path: 'workplaces/**', method: RequestMethod.ALL });
+      .forRoutes({ path: '/workplaces', method: RequestMethod.ALL });
+
     consumer
       .apply(IsNotExistsWorkplaceMiddleware)
-      .forRoutes({ path: 'workplaces/', method: RequestMethod.POST });
+      .forRoutes({ path: '/workplaces$', method: RequestMethod.POST });
+
     consumer
       .apply(IsUserHaveWorkplaceMiddleware)
       .forRoutes(
-        { path: 'workplaces/:workplaceId$', method: RequestMethod.ALL }
+        { path: '/workplaces/:workplaceId$', method: RequestMethod.ALL }
        );
+
     consumer
       .apply(IsExistsWorkplaceMiddleware)
       .forRoutes(
-        { path: 'workplaces/:workplaceId/', method: RequestMethod.ALL }
-      )
+        { path: '/workplaces/:workplaceId', method: RequestMethod.ALL }
+      );
   }
 }

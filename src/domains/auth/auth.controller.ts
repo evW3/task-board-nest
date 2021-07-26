@@ -1,7 +1,5 @@
-import { HttpException, HttpStatus } from "@nestjs/common";
+import { HttpCode, HttpException, HttpStatus } from '@nestjs/common';
 import { Body, Controller, Post, UsePipes } from "@nestjs/common";
-import { SchemaValidatePipe } from "src/pipes/schemaValidate.pipe";
-import { ROLES } from "src/utils/enums";
 import { RolesService } from "../roles/roles.service";
 import { Users } from "../users/users.model";
 import { UsersService } from "../users/users.service";
@@ -12,6 +10,9 @@ import { RegDto } from "./dto/reg.dto";
 import { RegSchema } from "./schemas/reg.schema";
 import { TokenService } from "./token.service";
 import { AuthSchema } from './schemas/auth.schema';
+import { SchemaValidatePipe } from '../../pipes/schemaValidate.pipe';
+import { ROLES } from '../../utils/enums';
+import { Code } from 'typeorm';
 
 @Controller('auth')
 export class AuthController {
@@ -45,6 +46,7 @@ export class AuthController {
     }
 
     @Post('sign-in')
+    @HttpCode(HttpStatus.OK)
     @UsePipes(new SchemaValidatePipe(AuthSchema))
     async signIn(@Body() authDto: AuthDto) {
       try {

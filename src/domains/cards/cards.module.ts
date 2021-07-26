@@ -31,12 +31,12 @@ export class CardsModule implements NestModule{
     consumer
       .apply(IsListIdMoveToExistsMiddleware)
       .forRoutes(
-        { path: '**/cards/move-all', method: RequestMethod.PATCH }
+        { path: '**/cards/move-all$', method: RequestMethod.PATCH }
       );
     consumer
       .apply(IsCanMoveCardMiddleware)
       .forRoutes(
-        { path: '**/:cardId/change-card-position', method: RequestMethod.PATCH }
+        { path: '**/cards/:cardId/change-card-position', method: RequestMethod.PATCH }
       )
   }
 

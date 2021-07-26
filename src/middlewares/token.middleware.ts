@@ -11,6 +11,7 @@ export class TokenMiddleware implements NestMiddleware {
       const token: string | undefined = req?.headers?.authorization?.split(' ')[1];
       if(token) {
         const params = this.tokenService.decryptToken(token);
+
         if(params.userId) {
           req.body = { ...req.body, ...params };
           next();

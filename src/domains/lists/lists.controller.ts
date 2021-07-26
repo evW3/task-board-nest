@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, HttpStatus, Param, Patch, Post, Req } from '@nestjs/common';
 import { ListsService } from './lists.service';
 import { ListsDto } from './dto/lists.dto';
 import { Lists } from './lists.model';
 import { Projects } from '../projects/projects.model';
+import { Request } from 'express';
 import { getManager } from 'typeorm';
 import { PositionQueriesService } from './positionQueries.service';
 
@@ -77,10 +78,21 @@ export class ListsController {
   }
 
   @Patch('/:listId/change-list-position')
-  async changeListPosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number) {
+  async changeListPosition(@Body('newPosition') newPosition: number, @Param('listId') listId: number, @Req() req: Request) {
     try {
       const listEntity = await getManager().findOne(Lists, listId);
-      await this.positionQueriesService.changePosition(newPosition, 'lists', listEntity.position);
+      const projectId = Number.parseInt(req.params.projectId);
+      if(newPosition < listEntity.position) {
+        await this.positionQueriesService.increaseWith(
+          'projects',
+          'lists',
+          projectId,
+          newPosition,
+          listEntity.position
+        );
+      } else {
+        await this.positionQueriesService.changePosition(newPosition, 'lists', listEntity.position);
+      }
       listEntity.position = newPosition;
 
       return await this.listsService.updateList(listEntity);

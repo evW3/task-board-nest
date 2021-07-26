@@ -20,6 +20,6 @@ export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
     consumer
       .apply(TokenMiddleware)
-      .forRoutes({ path: '/users/**', method: RequestMethod.ALL });
+      .forRoutes({ path: '/users', method: RequestMethod.ALL });
   }
 }

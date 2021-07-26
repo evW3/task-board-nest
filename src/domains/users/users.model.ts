@@ -1,6 +1,16 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Roles } from '../roles/roles.model';
 import { Workplaces } from '../workplaces/workplaces.model';
+import { Projects } from '../projects/projects.model';
 
 @Entity()
 export class Users {
