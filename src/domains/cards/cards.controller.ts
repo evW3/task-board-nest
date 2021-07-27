@@ -137,7 +137,26 @@ export class CardsController {
         }
       } else if((listId === changePositionDto.listIdMoveTo) && (isPositionPlaceEmpty.length != 0)) {
         console.log('3');
-        await this.positionQueriesService.changePositionWithJoin('lists', changePositionDto.listIdMoveTo, 'cards', changePositionDto.newPosition, cardEntity.position);
+        if(changePositionDto.newPosition < cardEntity.position) {
+          await this
+            .positionQueriesService
+            .increasePositionWithJoin(
+              'lists',
+              changePositionDto.listIdMoveTo,
+              'cards',
+              changePositionDto.newPosition,
+              cardEntity.position
+            )
+        }
+        await this
+          .positionQueriesService
+          .changePositionWithJoin(
+            'lists',
+            changePositionDto.listIdMoveTo,
+            'cards',
+            changePositionDto.newPosition,
+            cardEntity.position
+          );
       }
 
       listEntity.id = changePositionDto.listIdMoveTo;

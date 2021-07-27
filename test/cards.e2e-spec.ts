@@ -108,7 +108,7 @@ describe('Cards', () => {
     await cardTesting
       .changeCardPositionCheck(
         mockChangePosition,
-        lists[0].cards[0].id,
+        lists[0].cards[2].id,
         lists[0].id,
         HttpStatus.OK,
         userToken

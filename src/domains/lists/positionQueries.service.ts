@@ -15,20 +15,16 @@ export class PositionQueriesService {
       `);
   }
 
-  async changePositionWithJoin(parentTable: string, parentId: number, childTable: string, positionTo: number, positionFrom: number) {
+  async changePositionWithJoin(
+    parentTable: string,
+    parentId: number,
+    childTable: string,
+    positionTo: number,
+    positionFrom: number
+  ) {
     let parentIdColumnName: any = parentTable.split('').reverse();
     delete parentIdColumnName[0];
     parentIdColumnName = `${parentIdColumnName.reverse().join('')}_id`;
-    
-    await this.queryRunner.query(`
-      UPDATE ${childTable} 
-      SET position = ${childTable}.position + 1 
-      FROM ${parentTable} 
-      JOIN ${childTable} AS c 
-      ON ${parentTable}.id = c.${parentIdColumnName} 
-      WHERE ${childTable}.position > ${positionTo} 
-      AND ${parentTable}.id=${parentId};
-    `);
 
     await this.queryRunner.query(`
       UPDATE ${childTable} 
@@ -37,6 +33,29 @@ export class PositionQueriesService {
       JOIN ${childTable} AS c ON ${parentTable}.id = c.${parentIdColumnName} 
       WHERE ${childTable}.position <= ${positionTo} 
       AND ${childTable}.position > ${positionFrom} 
+      AND ${parentTable}.id=${parentId};
+    `);
+  }
+
+  async increasePositionWithJoin(
+    parentTable: string,
+    parentId: number,
+    childTable: string,
+    positionTo: number,
+    positionFrom: number
+  ) {
+    let parentIdColumnName: any = parentTable.split('').reverse();
+    delete parentIdColumnName[0];
+    parentIdColumnName = `${parentIdColumnName.reverse().join('')}_id`;
+
+    await this.queryRunner.query(`
+      UPDATE ${childTable} 
+      SET position = ${childTable}.position + 1 
+      FROM ${parentTable} 
+      JOIN ${childTable} AS c 
+      ON ${parentTable}.id = c.${parentIdColumnName} 
+      WHERE ${childTable}.position >= ${positionTo} 
+      AND ${childTable}.position <= ${positionFrom}
       AND ${parentTable}.id=${parentId};
     `);
   }

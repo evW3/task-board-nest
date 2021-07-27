@@ -74,7 +74,6 @@ export class CardTesting {
       .set({ Authorization: `Bearer ${token}` })
       .send(changeCardPositionDto)
       //.expect(expectStatus);
-    console.log(response.body);
     return response.body;
   }
 
