@@ -16,6 +16,7 @@ export class CardsService {
   async getCardsByList(list: Lists): Promise<Cards[]> {
     return await this.cardsRepository.find({
       where: { list },
+      order: { position: 'ASC' },
       join: {
         alias: 'cards',
         leftJoinAndSelect: {

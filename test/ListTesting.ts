@@ -46,7 +46,7 @@ export class ListTesting {
       selectedListsFromDb = await this.sendGetListsRequest(HttpStatus.OK, token);
 
       if(!this.simpleCheckPositions(selectedListsFromDb)) {
-        throw 'Checkout position error'
+        throw 'Checkout position error';
       }
 
       idx--;

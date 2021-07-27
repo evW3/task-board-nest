@@ -10,6 +10,7 @@ import { WorkplaceTesting } from './WorkplaceTesting';
 import { ProjectTesting } from './ProjectTesting';
 import { ListTesting } from './ListTesting';
 import { CardTesting } from './CardTesting';
+import { MyLogger } from '../src/utils/myLogger';
 
 const request = require('supertest')
 
@@ -22,6 +23,7 @@ describe('Cards', () => {
   const innerMockLists = [mockLists[0], mockLists[1]];
   const mockCards = [mockCard, mockCard, mockCard, mockCard, mockCard, mockCard];
   const mockUpdateCard = { name: 'OHH DAMN', description: 'VERY LARGE TROUBLES' };
+  const logger = new MyLogger();
 
   const initTestingClasses = (app: INestApplication) => {
     authTesting = new AuthTesting(app);
@@ -103,29 +105,94 @@ describe('Cards', () => {
   });
 
   it('Should change card position', async (done) => {
-    const lists = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
-    const mockChangePosition = { listIdMoveTo: lists[0].id, newPosition: 2 };
-    await cardTesting
-      .changeCardPositionCheck(
-        mockChangePosition,
-        lists[0].cards[2].id,
-        lists[0].id,
+    const interval = setInterval(async () => {
+      const lists = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+      //const listToLogBefore = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+      
+      let randomListFromIdx = getRandomInt(lists.length);
+
+      if(lists[randomListFromIdx].cards.length === 0) {
+        let errorChecker = 0;
+
+        while(lists[randomListFromIdx].cards.length === 0) {
+          if(errorChecker >= 100) {
+            break;
+          }
+          errorChecker++;
+          randomListFromIdx = getRandomInt(lists.length);
+        }
+
+        if(errorChecker >= 100) {
+          console.log(lists, lists.length);
+          throw 'While exepection';
+        }
+      }
+
+      const randomCardToMoveIdx = getRandomInt(lists[randomListFromIdx].cards.length);
+      const randomListToIdx = getRandomInt(lists.length);
+
+      let randomCardPositionToMove = -1;
+      let randomMockChangePositionDto = {};
+
+      if(randomListFromIdx === randomListToIdx) {
+        let innerCardsArray = [...lists[randomListFromIdx].cards];
+        
+        innerCardsArray = excludeIdxFromArray(innerCardsArray, randomCardToMoveIdx);
+        
+        if(innerCardsArray.length != 0)
+          randomCardPositionToMove = innerCardsArray[getRandomInt(innerCardsArray.length)].position;
+        
+      } else {
+        let innerCardsArray = lists[randomListToIdx].cards;
+
+        if(innerCardsArray.length === 0) {
+          randomCardPositionToMove = 1;
+        } else {
+          let maxPosition = 0;
+          innerCardsArray.forEach((card: Cards) => (maxPosition < card.position) && (maxPosition = card.position));
+          randomCardPositionToMove = getRandomInt(maxPosition) + 1;
+        }
+      }
+
+      randomMockChangePositionDto = {
+        listIdMoveTo: lists[randomListToIdx].id,
+        newPosition: randomCardPositionToMove
+      }
+      
+      cardTesting.changeCardPositionCheck(
+        randomMockChangePositionDto,
+        lists[randomListFromIdx].cards[randomCardToMoveIdx].id,
+        lists[randomListFromIdx].id,
         HttpStatus.OK,
         userToken
       );
-    console.log((await listTesting.sendGetListsRequest(HttpStatus.OK, userToken))[0].cards);
-    done();
+
+      //const listToLogAfter = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+      // logger.log(
+      //   randomMockChangePositionDto,
+      //   lists[randomListFromIdx].cards[randomCardToMoveIdx].id,
+      //   lists[randomListFromIdx].id,
+      //   listToLogBefore,
+      //   listToLogAfter
+      // );
+    }, 50);
+    
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+      done();
+    }, 1000);
   });
 
-  it('Should delete card', async (done) => {
-    await cardTesting.sendDeleteCardRequest(
-      listsEntities[0].id,
-      cardsEntities[0].id,
-      HttpStatus.OK,
-      userToken
-    );
-    done();
-  });
+  // it('Should delete card', async (done) => {
+  //   await cardTesting.sendDeleteCardRequest(
+  //     listsEntities[0].id,
+  //     cardsEntities[0].id,
+  //     HttpStatus.OK,
+  //     userToken
+  //   );
+  //   done();
+  // });
 
   afterAll(async (done) => {
     try {
@@ -144,4 +211,20 @@ describe('Cards', () => {
 
     done();
   });
+
+  function getRandomInt(max: number) {
+    return ~~(Math.random() * max)
+  }
+
+  function excludeIdxFromArray(array: any[], idxToExclude: any): any[] {
+    let newArray = [];
+
+    for(let key in array) {
+      if(key != (idxToExclude + '')) {
+        newArray.push(array[key]);
+      }
+    }
+
+    return newArray;
+  }
 });

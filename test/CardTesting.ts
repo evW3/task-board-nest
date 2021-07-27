@@ -69,12 +69,34 @@ export class CardTesting {
     expectStatus: HttpStatus,
     token: string
   ) {
+    
     const response = await request(this.app.getHttpServer())
       .patch(`${this.createPath()}/lists/${listIdFrom}/cards/${cardIdToMove}/change-card-position`)
       .set({ Authorization: `Bearer ${token}` })
       .send(changeCardPositionDto)
-      //.expect(expectStatus);
+      .expect(expectStatus);
+    
+    const listCards = await this
+      .sendGetCardsRequest(changeCardPositionDto.listIdMoveTo, HttpStatus.OK, token);
+
+    if(!this.simpleCheckPositions(listCards)) {
+      console.log(listCards);
+      
+      throw 'Check position error'
+    }
+    
     return response.body;
+  }
+
+  private simpleCheckPositions(cards: Cards[]) {
+    let idx = 1;
+    for(let card of cards) {
+      if(cards.findIndex((card: any) => card.position === idx) === -1) {
+        return false;
+      }
+      idx++;
+    }
+    return true;
   }
 
   async sendDeleteCardRequest(

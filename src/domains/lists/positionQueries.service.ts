@@ -28,12 +28,10 @@ export class PositionQueriesService {
 
     await this.queryRunner.query(`
       UPDATE ${childTable} 
-      SET position = ${childTable}.position - 1 
-      FROM ${parentTable} 
-      JOIN ${childTable} AS c ON ${parentTable}.id = c.${parentIdColumnName} 
+      SET position = ${childTable}.position - 1
       WHERE ${childTable}.position <= ${positionTo} 
       AND ${childTable}.position > ${positionFrom} 
-      AND ${parentTable}.id=${parentId};
+      AND ${childTable}.${parentIdColumnName}=${parentId};
     `);
   }
 
@@ -51,12 +49,9 @@ export class PositionQueriesService {
     await this.queryRunner.query(`
       UPDATE ${childTable} 
       SET position = ${childTable}.position + 1 
-      FROM ${parentTable} 
-      JOIN ${childTable} AS c 
-      ON ${parentTable}.id = c.${parentIdColumnName} 
       WHERE ${childTable}.position >= ${positionTo} 
       AND ${childTable}.position <= ${positionFrom}
-      AND ${parentTable}.id=${parentId};
+      AND ${childTable}.${parentIdColumnName}=${parentId};
     `);
   }
 
