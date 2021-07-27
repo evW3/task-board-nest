@@ -1,5 +1,6 @@
 import { HttpStatus, INestApplication } from '@nestjs/common';
 import { Lists } from '../src/domains/lists/lists.model';
+import { Cards } from '../src/domains/cards/cards.model';
 
 const request = require('supertest');
 
@@ -52,7 +53,8 @@ export class CardTesting {
   async sendGetCardsRequest(
     listId: number,
     expectStatus: HttpStatus,
-    token: string) {
+    token: string
+  ) {
     const response = await request(this.app.getHttpServer())
       .get(`${this.createPath()}/lists/${listId}/cards/`)
       .set({ Authorization: `Bearer ${token}` })
@@ -61,14 +63,19 @@ export class CardTesting {
   }
 
   async changeCardPositionCheck(
-    lists: Lists[],
-    token: string,
-    idxCardToMove: number,
-    idxListToMove: number
+    changeCardPositionDto: any,
+    cardIdToMove: number,
+    listIdFrom: number,
+    expectStatus: HttpStatus,
+    token: string
   ) {
-    for(let list of lists) {
-
-    }
+    const response = await request(this.app.getHttpServer())
+      .patch(`${this.createPath()}/lists/${listIdFrom}/cards/${cardIdToMove}/change-card-position`)
+      .set({ Authorization: `Bearer ${token}` })
+      .send(changeCardPositionDto)
+      //.expect(expectStatus);
+    console.log(response.body);
+    return response.body;
   }
 
   async sendDeleteCardRequest(

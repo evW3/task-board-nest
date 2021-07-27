@@ -104,7 +104,16 @@ describe('Cards', () => {
 
   it('Should change card position', async (done) => {
     const lists = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
-    await cardTesting.changeCardPositionCheck(lists, userToken);
+    const mockChangePosition = { listIdMoveTo: lists[0].id, newPosition: 2 };
+    await cardTesting
+      .changeCardPositionCheck(
+        mockChangePosition,
+        lists[0].cards[0].id,
+        lists[0].id,
+        HttpStatus.OK,
+        userToken
+      );
+    console.log((await listTesting.sendGetListsRequest(HttpStatus.OK, userToken))[0].cards);
     done();
   });
 

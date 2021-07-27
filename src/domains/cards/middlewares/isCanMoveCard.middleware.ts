@@ -22,7 +22,7 @@ export class IsCanMoveCardMiddleware implements NestMiddleware {
       if(((lastPosition + 1) >= newPosition) && (cardEntity.position != newPosition || cardListId != listId))
         next();
       else
-        next(new HttpException('Can`t move list', HttpStatus.BAD_REQUEST));
+        next(new HttpException('Can`t move card', HttpStatus.BAD_REQUEST));
     } catch (e) {
       if(e instanceof HttpException)
         next(e);
