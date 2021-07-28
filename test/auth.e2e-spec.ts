@@ -11,27 +11,43 @@ describe('Auth', () => {
   let authTesting: AuthTesting;
 
   beforeAll(async (done) => {
-    appTesting = new AppTesting();
-    await appTesting.startTestServer();
-
-    authTesting = new AuthTesting(appTesting.app);
-
-    done();
+    try {
+      appTesting = new AppTesting();
+      await appTesting.startTestServer();
+  
+      authTesting = new AuthTesting(appTesting.app);
+  
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should register user', async (done) => {
-    await authTesting.sendRegisterRequest(mockUser, HttpStatus.CREATED);
-    done();
+    try {
+      await authTesting.sendRegisterRequest(mockUser, HttpStatus.CREATED);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Shouldn`t register user', async (done) => {
-    await authTesting.sendRegisterRequest(mockUser, HttpStatus.BAD_REQUEST);
-    done();
+    try {
+      await authTesting.sendRegisterRequest(mockUser, HttpStatus.BAD_REQUEST);
+      done(); 
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should auth user', async (done) => {
-    await authTesting.sendAuthRequest(mockAuthDto, HttpStatus.OK);
-    done();
+    try {
+      await authTesting.sendAuthRequest(mockAuthDto, HttpStatus.OK);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   afterAll(async (done) => {
@@ -45,9 +61,9 @@ describe('Auth', () => {
           FROM users
           WHERE email='${mockUser.email}';
        `);
+      done();
     } catch (e) {
       throw e;
     }
-    done();
   });
 })

@@ -69,8 +69,7 @@ export class CardTesting {
     expectStatus: HttpStatus,
     token: string
   ) {
-    
-    const response = await request(this.app.getHttpServer())
+      const response = await request(this.app.getHttpServer())
       .patch(`${this.createPath()}/lists/${listIdFrom}/cards/${cardIdToMove}/change-card-position`)
       .set({ Authorization: `Bearer ${token}` })
       .send(changeCardPositionDto)
@@ -79,9 +78,7 @@ export class CardTesting {
     const listCards = await this
       .sendGetCardsRequest(changeCardPositionDto.listIdMoveTo, HttpStatus.OK, token);
 
-    if(!this.simpleCheckPositions(listCards)) {
-      console.log(listCards);
-      
+    if(!this.simpleCheckPositions(listCards)) {      
       throw 'Check position error'
     }
     

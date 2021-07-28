@@ -29,37 +29,53 @@ describe('Project', () => {
   let userToken: string;
 
   beforeAll(async (done) => {
-    appTesting = new AppTesting();
-    await appTesting.startTestServer();
-
-    initTestingClasses(appTesting.app);
-
-    userToken = await authTesting
-      .sendRegisterRequest(mockUser, HttpStatus.CREATED);
-
-    workplaceEntity = await workplaceTesting
-      .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
-
-    projectTesting = new ProjectTesting(appTesting.app, workplaceEntity.id);
-
-    done();
+    try {
+      appTesting = new AppTesting();
+      await appTesting.startTestServer();
+  
+      initTestingClasses(appTesting.app);
+  
+      userToken = await authTesting
+        .sendRegisterRequest(mockUser, HttpStatus.CREATED);
+  
+      workplaceEntity = await workplaceTesting
+        .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
+  
+      projectTesting = new ProjectTesting(appTesting.app, workplaceEntity.id);
+  
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should create project', async (done) => {
-    projectEntity = await projectTesting
-      .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
-    done();
+    try {
+      projectEntity = await projectTesting
+        .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
+      done(); 
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should update project', async (done)  => {
-    projectEntity = await projectTesting
-      .sendUpdateProjectRequest(mockUpdateProject, projectEntity.id, HttpStatus.OK, userToken)
-    done();
+    try {
+      projectEntity = await projectTesting
+        .sendUpdateProjectRequest(mockUpdateProject, projectEntity.id, HttpStatus.OK, userToken)
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should delete project', async (done) => {
-    await projectTesting.sendDeleteProjectRequest(projectEntity.id, HttpStatus.OK, userToken);
-    done();
+    try {
+      await projectTesting.sendDeleteProjectRequest(projectEntity.id, HttpStatus.OK, userToken);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   afterAll(async (done) => {

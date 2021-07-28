@@ -124,12 +124,6 @@ export class PositionQueriesService {
     `);
   }
 
-  async test() {
-    console.log(await this.queryRunner.query(`
-      SELECT * FROM lists JOIN cards ON cards.list_id=lists.id;
-    `));
-  }
-
   private init() {
     const connection: Connection = getConnection();
 

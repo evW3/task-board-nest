@@ -119,25 +119,11 @@ export class CardsController {
       const listId = Number.parseInt(req.params.listId);
       
       const cardEntity = await getManager().findOne(Cards, cardId);
-      // const isPositionPlaceEmpty = await this.positionQueriesService
-      // .getEntityByPosition('lists', 'cards', changePositionDto.listIdMoveTo, cardEntity.position);
-      // //console.log(isPositionPlaceEmpty);
-      
-      // console.log(isPositionPlaceEmpty);
-      // console.log(listId, ' listId');
-      // console.log(changePositionDto.listIdMoveTo, ' changePositionDto.listIdMoveTo');
-      // console.log((listId === changePositionDto.listIdMoveTo) && (isPositionPlaceEmpty.length != 0));
       
       if(listId != changePositionDto.listIdMoveTo) {
-        console.log('1');
-        //console.log(cardEntity);
         await this.positionQueriesService.decreaseOrIncreaseInPositions('lists', 'cards', listId, cardEntity.position, true);
-        //console.log(await this.positionQueriesService.test());
-        console.log('2');
         await this.positionQueriesService.decreaseOrIncreaseInPositions('lists', 'cards', changePositionDto.listIdMoveTo, changePositionDto.newPosition, false)
-        // console.log(await this.positionQueriesService.test());
       } else if(listId === changePositionDto.listIdMoveTo) {
-        console.log('3');
         if(changePositionDto.newPosition < cardEntity.position) {
           await this
             .positionQueriesService
@@ -147,7 +133,7 @@ export class CardsController {
               'cards',
               changePositionDto.newPosition,
               cardEntity.position
-            )
+            );
         } else {
           await this
             .positionQueriesService
@@ -202,10 +188,10 @@ export class CardsController {
   @Delete('/:cardId/')
   async deleteCard(@Param('cardId') cardId: number) {
     try {
-        const cardEntity = await getManager().findOne(Cards, cardId);
+      const cardEntity = await getManager().findOne(Cards, cardId);
 
-        await this.cardsService.deleteCard(cardEntity);
-        return { message: 'Card was deleted', status: HttpStatus.OK }
+      await this.cardsService.deleteCard(cardEntity);
+      return { message: 'Card was deleted', status: HttpStatus.OK }
     } catch(e) {
       throw new HttpException(e.message, HttpStatus.BAD_REQUEST);
     }

@@ -18,10 +18,7 @@ export class IsCardMemberMiddleware implements NestMiddleware {
       else
         next(new HttpException('U must be in member list of this card', HttpStatus.FORBIDDEN));
     } catch (e) {
-      if(e instanceof HttpException)
-        next(e);
-      else
-        next(new HttpException(e.message, HttpStatus.BAD_REQUEST));
+      next(new HttpException(e.message, HttpStatus.BAD_REQUEST));
     }
   }
 }

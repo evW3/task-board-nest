@@ -31,57 +31,73 @@ describe('Project', () => {
   let listEntities: Lists[] = [];
   let userToken: string;
 
-  beforeAll(async (done) => {
-    appTesting = new AppTesting();
-    await appTesting.startTestServer();
-
-    initTestingClasses(appTesting.app);
-
-    userToken = await authTesting
-      .sendRegisterRequest(mockUser, HttpStatus.CREATED);
-
-    workplaceEntity = await workplaceTesting
-      .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
-
-    projectTesting = new ProjectTesting(appTesting.app, workplaceEntity.id);
-
-    projectEntity = await projectTesting
-      .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
-
-    listTesting = new ListTesting(appTesting.app, workplaceEntity.id, projectEntity.id);
-
-    done();
+  beforeAll(async (done) => { 
+    try {
+      appTesting = new AppTesting();
+      await appTesting.startTestServer();
+  
+      initTestingClasses(appTesting.app);
+  
+      userToken = await authTesting
+        .sendRegisterRequest(mockUser, HttpStatus.CREATED);
+  
+      workplaceEntity = await workplaceTesting
+        .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
+  
+      projectTesting = new ProjectTesting(appTesting.app, workplaceEntity.id);
+  
+      projectEntity = await projectTesting
+        .sendCreateProjectRequest(mockProject, HttpStatus.CREATED, userToken);
+  
+      listTesting = new ListTesting(appTesting.app, workplaceEntity.id, projectEntity.id);
+  
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should create lists', async (done) => {
-    for(let mockList of innerMockLists) {
-      const res = await listTesting
-        .sendCreateListRequest(mockList, HttpStatus.CREATED, userToken);
-
-      listEntities.push(res);
+    try {
+      for(let mockList of innerMockLists) {
+        const res = await listTesting
+          .sendCreateListRequest(mockList, HttpStatus.CREATED, userToken);
+  
+        listEntities.push(res);
+      }
+      done();
+    } catch(e) {
+      throw e;
     }
-    done();
   });
 
   it('Should change list position', async (done) => {
     try {
       await listTesting
         .changeListPositionCheck(listEntities, userToken);
+      done();
     } catch (e) {
       throw e;
     }
-    done();
   });
 
   it('Should delete list', async (done) => {
-    await listTesting
-      .sendDeleteListRequest(listEntities[0].id, HttpStatus.OK, userToken);
-    done();
+    try {
+      await listTesting
+        .sendDeleteListRequest(listEntities[0].id, HttpStatus.OK, userToken);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should get lists', async (done) => {
-    await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
-    done();
+    try {
+      await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   afterAll(async (done) => {
@@ -95,10 +111,10 @@ describe('Project', () => {
           FROM users
           WHERE email='${mockUser.email}';
        `);
+      done();
     } catch (e) {
       throw e;
     }
-    done();
   });
 })
 

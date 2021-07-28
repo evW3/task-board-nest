@@ -5,11 +5,11 @@ import * as fs from 'fs';
 import path from 'path';
 
 async function bootstrap() {
-  const PORT = process.env.PORT;
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new HttpExceptionFilter);
-  initUploadDir();
-  await app.listen(PORT, () => console.log(`Server start on port ${PORT}`));
+    const PORT = process.env.PORT;
+    const app = await NestFactory.create(AppModule);
+    app.useGlobalFilters(new HttpExceptionFilter);
+    initUploadDir();
+    await app.listen(PORT, () => console.log(`Server start on port ${PORT}`));
 }
 
 function initUploadDir() {

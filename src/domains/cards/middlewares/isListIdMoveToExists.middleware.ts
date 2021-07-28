@@ -21,10 +21,7 @@ export class IsListIdMoveToExistsMiddleware implements NestMiddleware {
       else
         next(new HttpException('Can`t find list', HttpStatus.BAD_REQUEST));
     } catch (e) {
-      if(e instanceof HttpException)
-        next(e);
-      else
-        next(new HttpException(e.message, HttpStatus.BAD_REQUEST));
+      next(new HttpException(e.message, HttpStatus.BAD_REQUEST));
     }
   }
 }

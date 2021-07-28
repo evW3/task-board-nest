@@ -35,7 +35,7 @@ export class MyLogger {
       `,
       err => {
         if(!err)
-          console.log('Saved!');
+          throw 'Can`t save log';
       }
     );
   }

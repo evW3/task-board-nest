@@ -71,128 +71,113 @@ describe('Cards', () => {
     } catch (e) {
       throw e;
     }
-  });
+  }, 10000);
 
   it('Should create cards', async (done) => {
-    let counter = 1;
-    let listIdx = 0;
-
-    for(let mockCard of mockCards) {
-
-      if(counter === ((~~(mockCards.length / listsEntities.length)) + 1)) {
-        listIdx++;
+    try {
+      let counter = 1;
+      let listIdx = 0;
+  
+      for(let mockCard of mockCards) {
+  
+        if(counter === ((~~(mockCards.length / listsEntities.length)) + 1)) {
+          listIdx++;
+        }
+  
+        cardsEntities.push(
+          await cardTesting
+            .sendCreateCardRequest(mockCard, listsEntities[listIdx].id, HttpStatus.CREATED, userToken)
+        );
+  
+        counter++;
       }
-
-      cardsEntities.push(
-        await cardTesting
-          .sendCreateCardRequest(mockCard, listsEntities[listIdx].id, HttpStatus.CREATED, userToken)
-      );
-
-      counter++;
+      done();
+    } catch(e) {
+      throw e;
     }
-    done();
   });
 
   it('Should update card', async (done) => {
-    cardsEntities[0] = await cardTesting.sendUpdateCardRequest(
-      mockUpdateCard,
-      cardsEntities[0].id,
-      listsEntities[0].id,
-      HttpStatus.OK,
-      userToken
-    );
-    done();
-  });
-
-  it('Should change card position', async (done) => {
-    const interval = setInterval(async () => {
-      const lists = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
-      //const listToLogBefore = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
-      
-      let randomListFromIdx = getRandomInt(lists.length);
-
-      if(lists[randomListFromIdx].cards.length === 0) {
-        let errorChecker = 0;
-
-        while(lists[randomListFromIdx].cards.length === 0) {
-          if(errorChecker >= 100) {
-            break;
-          }
-          errorChecker++;
-          randomListFromIdx = getRandomInt(lists.length);
-        }
-
-        if(errorChecker >= 100) {
-          console.log(lists, lists.length);
-          throw 'While exepection';
-        }
-      }
-
-      const randomCardToMoveIdx = getRandomInt(lists[randomListFromIdx].cards.length);
-      const randomListToIdx = getRandomInt(lists.length);
-
-      let randomCardPositionToMove = -1;
-      let randomMockChangePositionDto = {};
-
-      if(randomListFromIdx === randomListToIdx) {
-        let innerCardsArray = [...lists[randomListFromIdx].cards];
-        
-        innerCardsArray = excludeIdxFromArray(innerCardsArray, randomCardToMoveIdx);
-        
-        if(innerCardsArray.length != 0)
-          randomCardPositionToMove = innerCardsArray[getRandomInt(innerCardsArray.length)].position;
-        
-      } else {
-        let innerCardsArray = lists[randomListToIdx].cards;
-
-        if(innerCardsArray.length === 0) {
-          randomCardPositionToMove = 1;
-        } else {
-          let maxPosition = 0;
-          innerCardsArray.forEach((card: Cards) => (maxPosition < card.position) && (maxPosition = card.position));
-          randomCardPositionToMove = getRandomInt(maxPosition) + 1;
-        }
-      }
-
-      randomMockChangePositionDto = {
-        listIdMoveTo: lists[randomListToIdx].id,
-        newPosition: randomCardPositionToMove
-      }
-      
-      cardTesting.changeCardPositionCheck(
-        randomMockChangePositionDto,
-        lists[randomListFromIdx].cards[randomCardToMoveIdx].id,
-        lists[randomListFromIdx].id,
+    try {
+      cardsEntities[0] = await cardTesting.sendUpdateCardRequest(
+        mockUpdateCard,
+        cardsEntities[0].id,
+        listsEntities[0].id,
         HttpStatus.OK,
         userToken
       );
-
-      //const listToLogAfter = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
-      // logger.log(
-      //   randomMockChangePositionDto,
-      //   lists[randomListFromIdx].cards[randomCardToMoveIdx].id,
-      //   lists[randomListFromIdx].id,
-      //   listToLogBefore,
-      //   listToLogAfter
-      // );
-    }, 50);
-    
-    const timeout = setTimeout(() => {
-      clearInterval(interval);
-      clearTimeout(timeout);
       done();
-    }, 1000);
+    } catch(e) {
+      throw e;
+    }
   });
 
-  // it('Should delete card', async (done) => {
-  //   await cardTesting.sendDeleteCardRequest(
-  //     listsEntities[0].id,
-  //     cardsEntities[0].id,
-  //     HttpStatus.OK,
-  //     userToken
-  //   );
-  //   done();
-  // });
+  it('Should change card position', async (done) => {
+    try {
+      const interval = setInterval(async () => {
+        const lists = await listTesting.sendGetListsRequest(HttpStatus.OK, userToken);
+        
+        let randomListFromIdx = findListWithCards(lists);
+  
+        const randomCardToMoveIdx = getRandomInt(lists[randomListFromIdx].cards.length);
+        const randomListToIdx = getRandomInt(lists.length);
+  
+        let randomCardPositionToMove = -1;
+        let randomMockChangePositionDto = {};
+  
+        if(randomListFromIdx === randomListToIdx) {
+          let innerCardsArray = [...lists[randomListFromIdx].cards];
+          
+          randomCardPositionToMove = innerCardsArray[getRandomInt(innerCardsArray.length)].position;
+        } else {
+          let innerCardsArray = lists[randomListToIdx].cards;
+  
+          if(innerCardsArray.length === 0) {
+            randomCardPositionToMove = 1;
+          } else {
+            let maxPosition = 0;
+            innerCardsArray.forEach((card: Cards) => (maxPosition < card.position) && (maxPosition = card.position));
+            randomCardPositionToMove = getRandomInt(maxPosition) + 1;
+          }
+        }
+        
+        randomMockChangePositionDto = {
+          listIdMoveTo: lists[randomListToIdx].id,
+          newPosition: randomCardPositionToMove
+        }
+        
+        cardTesting.changeCardPositionCheck(
+          randomMockChangePositionDto,
+          lists[randomListFromIdx].cards[randomCardToMoveIdx].id,
+          lists[randomListFromIdx].id,
+          HttpStatus.OK,
+          userToken
+        );
+      }, 100);
+      
+      const timeout = setTimeout(() => {
+        clearInterval(interval);
+        clearTimeout(timeout);
+        done();
+      }, 1000);
+    } catch(e) {
+      throw e;
+    }
+  });
+
+  it('Should delete card', async (done) => {
+    try {
+      await cardTesting.sendDeleteCardRequest(
+        listsEntities[0].id,
+        cardsEntities[0].id,
+        HttpStatus.OK,
+        userToken
+      );
+      done();
+    } catch(e) {
+      throw e;
+    }
+  });
 
   afterAll(async (done) => {
     try {
@@ -205,26 +190,32 @@ describe('Cards', () => {
           FROM users
           WHERE email='${mockUser.email}';
        `);
+      done();
     } catch (e) {
       throw e;
     }
 
-    done();
   });
 
   function getRandomInt(max: number) {
     return ~~(Math.random() * max)
   }
 
-  function excludeIdxFromArray(array: any[], idxToExclude: any): any[] {
-    let newArray = [];
+  function findListWithCards(lists: Lists[]) {
+    let errorChecker = 0;
+    let randomListFromIdx = getRandomInt(lists.length);
 
-    for(let key in array) {
-      if(key != (idxToExclude + '')) {
-        newArray.push(array[key]);
+    while(lists[randomListFromIdx].cards.length === 0) {
+      if(errorChecker >= 100) {
+        break;
       }
+      errorChecker++;
+      randomListFromIdx = getRandomInt(lists.length);
     }
 
-    return newArray;
+    if(errorChecker >= 100) {
+      throw 'While exepection';
+    }
+    return randomListFromIdx;
   }
 });

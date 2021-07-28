@@ -23,32 +23,48 @@ describe('Workplace', () => {
   let workplaceEntity: Workplaces;
 
   beforeAll(async (done) => {
-    appTesting = new AppTesting();
-    await appTesting.startTestServer();
-
-    initTestingClasses(appTesting.app);
-
-    userToken = await authTesting.sendRegisterRequest(mockUser, HttpStatus.CREATED);
-
-    done();
+    try {
+      appTesting = new AppTesting();
+      await appTesting.startTestServer();
+  
+      initTestingClasses(appTesting.app);
+  
+      userToken = await authTesting.sendRegisterRequest(mockUser, HttpStatus.CREATED);
+  
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should create workplace', async (done) => {
-    workplaceEntity = await workplaceTesting
-      .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
-    done();
+    try {
+      workplaceEntity = await workplaceTesting
+        .sendCreateWorkplaceRequest(mockWorkplace, HttpStatus.CREATED, userToken);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should update workplace', async (done)  => {
-    workplaceEntity = await workplaceTesting
-      .sendUpdateWorkplaceRequest(mockUpdateWorkplace, workplaceEntity.id, HttpStatus.OK, userToken);
-    done();
+    try {
+      workplaceEntity = await workplaceTesting
+        .sendUpdateWorkplaceRequest(mockUpdateWorkplace, workplaceEntity.id, HttpStatus.OK, userToken);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   it('Should delete workplace', async (done) => {
-    await workplaceTesting
-      .sendDeleteWorkplaceRequest(workplaceEntity.id, HttpStatus.OK, userToken);
-    done();
+    try {
+      await workplaceTesting
+        .sendDeleteWorkplaceRequest(workplaceEntity.id, HttpStatus.OK, userToken);
+      done();
+    } catch(e) {
+      throw e;
+    }
   });
 
   afterAll(async (done) => {
@@ -61,10 +77,9 @@ describe('Workplace', () => {
           FROM users
           WHERE email='${mockUser.email}';
        `);
+      done();
     } catch (e) {
       throw e;
     }
-
-    done();
   });
 });

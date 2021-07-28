@@ -18,16 +18,12 @@ export class IsCanMoveCardMiddleware implements NestMiddleware {
       const cardId = req.params.cardId;
       const cardEntity = await getManager().findOne(Cards, cardId);
       const lastPosition = (await this.positionQueriesService.getMaxOrMinPosition('lists', listId, 'cards', 'MAX'))[0].position || 1;
-      
-      if(((lastPosition + 1) >= newPosition) && (cardEntity.position != newPosition || cardListId != listId))
+      if(((lastPosition + 1) >= newPosition))
         next();
       else
         next(new HttpException('Can`t move card', HttpStatus.BAD_REQUEST));
     } catch (e) {
-      if(e instanceof HttpException)
-        next(e);
-      else
-        next(new HttpException(e.message, HttpStatus.BAD_REQUEST));
+      next(new HttpException(e.message, HttpStatus.BAD_REQUEST));
     }
   }
 }
